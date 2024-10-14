@@ -33,6 +33,7 @@ function make_environment(...envs) {
 const { instance } = await WebAssembly.instantiateStreaming(fetch("./app.wasm"), {
     "env": make_environment({
         'random': Math.random,
+        'scale': () => {return scale},
     })
 });
 
@@ -62,14 +63,14 @@ instance.exports.init();
 let prev = null;
 function first(timestamp) {
     prev = timestamp;
-    instance.exports.go(0.16, scale);
+    instance.exports.go(0.16);
     window.requestAnimationFrame(loop);
 }
 function loop(timestamp) {
     const dt = timestamp - prev;
     prev = timestamp;
 
-    instance.exports.go(dt/1000, scale);
+    instance.exports.go(dt/1000);
     ctx.putImageData(image, 0, 0);
     window.requestAnimationFrame(loop);
 }

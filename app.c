@@ -8,6 +8,8 @@ const unsigned int width = 800;
 const unsigned int height = 600;
 unsigned int BUFFER[width * height];
 
+int scale(void);
+
 typedef struct v2 {
     float x, y;
 } v2;
@@ -40,7 +42,7 @@ void init()
     }
 }
 
-void go(float dt, int scale)
+void go(float dt)
 {
     for (int i = 0; i < NB; i++) {
         v2 npos;
@@ -76,15 +78,15 @@ void go(float dt, int scale)
         }
     }
 
-    v2 penger_origin = {(float) width/2 - 32*scale/2, (float) height/2 - 32*scale/2};
+    v2 penger_origin = {(float) width/2 - 32*scale()/2, (float) height/2 - 32*scale()/2};
     for (int i = 0; i < 32; i++) {
         for (int y = 0; y < 32; y++) {
             if (penger_img[i][y] == 0)
                 continue;
-            for (int s1 = 0; s1 < scale; s1++) {
-                for (int s2 = 0; s2 < scale; s2++) {
-                    int idx_x = penger_origin.x + y*scale+s1;
-                    int idx_y = penger_origin.y + i*scale+s2;
+            for (int s1 = 0; s1 < scale(); s1++) {
+                for (int s2 = 0; s2 < scale(); s2++) {
+                    int idx_x = penger_origin.x + y*scale()+s1;
+                    int idx_y = penger_origin.y + i*scale()+s2;
                     if (idx_x < 0 || idx_x > width || idx_y < 0 || idx_y > height)
                         continue;
                     BUFFER[idx_y*width + idx_x] = penger_img[i][y];
