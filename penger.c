@@ -1,5 +1,5 @@
 #define t 0x00000000
-#define G 0xff000000
+#define B 0xff000000
 #define g 0xff383838
 #define w 0xffc0c0c0
 #define y 0xff36c7fb
@@ -38,3 +38,9 @@ unsigned int penger_img[32][32] = {
     t,t,t,t,t,B,B,B,y,y,B,B,B,t,t,t,t,t,t,t,t,t,B,B,B,y,y,B,B,t,t,t,
     t,t,t,t,t,t,t,B,B,B,B,t,t,t,t,t,t,t,t,t,t,t,t,t,B,B,B,B,t,t,t,t,
 };
+
+#undef t
+#undef B
+#undef g
+#undef w
+#undef y
