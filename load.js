@@ -1,9 +1,12 @@
-var scale = 12;
+var scale = 7;
+
+var global_instance;
 
 window.onload = () => {
     var scale_but = document.getElementById("scaling");
     var descale_but = document.getElementById("descaling");
     var scale_p = document.getElementById("scale");
+    var reset_but = document.getElementById("reset");
     scale_p.innerText = "scale: " + scale;
     scale_but.onclick = () => {
         scale++;
@@ -12,6 +15,9 @@ window.onload = () => {
     descale_but.onclick = () => {
         scale--;
         scale_p.innerText = "scale: " + scale;
+    }
+    reset_but.onclick = () => {
+        global_instance.exports.reset_velocity();
     }
 };
 
@@ -33,9 +39,11 @@ function make_environment(...envs) {
 const { instance } = await WebAssembly.instantiateStreaming(fetch("./app.wasm"), {
     "env": make_environment({
         'random': Math.random,
-        'scale': () => {return scale},
+        'get_scale': () => {return scale},
     })
 });
+
+global_instance = instance;
 
 const memory = new Uint32Array(instance.exports.memory.buffer);
 
@@ -75,5 +83,13 @@ function loop(timestamp) {
     window.requestAnimationFrame(loop);
 }
 window.requestAnimationFrame(first);
+
+addEventListener('keydown', (e) => {
+    instance.exports.key_pressed(e.keyCode);
+});
+
+addEventListener('keyup', (e) => {
+    instance.exports.key_released(e.keyCode);
+});
 
 })()

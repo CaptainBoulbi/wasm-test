@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export_sym="init go BUFFER width height"
+export_sym="init go key_pressed key_released reset_velocity BUFFER width height"
 export_cmd=""
 for e in $export_sym; do
     export_cmd="$export_cmd -Wl,--export=$e";
