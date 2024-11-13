@@ -87,7 +87,7 @@ void go(float dt)
                 for (int s2 = 0; s2 < scale(); s2++) {
                     int idx_x = penger_origin.x + i*scale()+s1;
                     int idx_y = penger_origin.y + y*scale()+s2;
-                    if (idx_x < 0 || idx_x > width || idx_y < 0 || idx_y > height)
+                    if (idx_x < 0 || idx_x >= width || idx_y < 0 || idx_y >= height)
                         continue;
                     BUFFER[idx_y*width + idx_x] = penger_img[y][i];
                 }
