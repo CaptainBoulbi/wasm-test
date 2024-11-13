@@ -79,17 +79,17 @@ void go(float dt)
     }
 
     v2 penger_origin = {(float) width/2 - 32*scale()/2, (float) height/2 - 32*scale()/2};
-    for (int i = 0; i < penger_height; i++) {
-        for (int y = 0; y < penger_width; y++) {
-            if (penger_img[i][y] <= 0x00FFFFFF)
+    for (int y = 0; y < penger_height; y++) {
+        for (int i = 0; i < penger_width; i++) {
+            if (penger_img[y][i] <= 0x00FFFFFF)
                 continue;
             for (int s1 = 0; s1 < scale(); s1++) {
                 for (int s2 = 0; s2 < scale(); s2++) {
-                    int idx_x = penger_origin.x + y*scale()+s1;
-                    int idx_y = penger_origin.y + i*scale()+s2;
+                    int idx_x = penger_origin.x + i*scale()+s1;
+                    int idx_y = penger_origin.y + y*scale()+s2;
                     if (idx_x < 0 || idx_x > width || idx_y < 0 || idx_y > height)
                         continue;
-                    BUFFER[idx_y*width + idx_x] = penger_img[i][y];
+                    BUFFER[idx_y*width + idx_x] = penger_img[y][i];
                 }
             }
         }
