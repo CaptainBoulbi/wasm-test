@@ -1,4 +1,5 @@
 #include "penger.c"
+#include "hand.c"
 
 #define GREEN 0xff00ff00
 #define RED 0xff0000ff
@@ -14,6 +15,7 @@ unsigned int BUFFER[width * height];
 // importer depuis js
 int get_scale(void);
 float random(void); // flemme de coder un algo random, je recup celui de js (Math.random)
+float sqrtf(float val); // pareil
 
 typedef struct v2 {
     float x, y;
@@ -22,6 +24,35 @@ typedef struct v2 {
 // position du penger au milieu
 v2 penger_pos = {width/2, height/2};
 v2 velocity = {0, 0};
+v2 mouse = {0, 0};
+
+v2 v2_diff(v2 vec1, v2 vec2)
+{
+    return (v2) {
+        .x = vec1.x - vec2.x,
+        .y = vec1.y - vec2.y,
+    };
+}
+v2 v2_normalize(v2 vec)
+{
+    v2 result = {0};
+    float length = sqrtf((vec.x*vec.x) + (vec.y*vec.y));
+
+    if (length > 0) {
+        float ilength = 1.0f/length;
+        result.x = vec.x*ilength;
+        result.y = vec.y*ilength;
+    }
+
+    return result;
+}
+v2 v2_scale(v2 vec, int scale)
+{
+    return (v2) {
+        .x = vec.x * scale,
+        .y = vec.y * scale,
+    };
+}
 
 // keyboard code definit par js
 typedef enum Key {
@@ -53,6 +84,11 @@ void set_velocity(float x, float y)
     velocity = (v2){x, y};
 }
 
+void set_mouse(float x, float y)
+{
+    mouse = (v2){x, y};
+}
+
 int rand(int min, int max)
 {
     return min + random() * (max - min);
@@ -79,6 +115,12 @@ void rebondi(v2 *pos, int scale)
     }
 }
 
+int collision(v2 point, int x, int y, int w, int h)
+{
+    return (point.x >= x && point.x < x + w &&
+            point.y >= y && point.y < y + h);
+}
+
 void init()
 {
 }
@@ -87,10 +129,24 @@ void draw(float dt)
 {
     int scale = get_scale();
 
+    // position du penger en haut a gauche de l'image
+    v2 penger_origin = {0};
+    penger_origin.x = penger_pos.x - penger_width*scale/2;
+    penger_origin.y = penger_pos.y - penger_height*scale/2;
+
     // jump
     if (keys[SPACE]) {
         velocity.y += velocity.y < 0 ? -10 : 10;
         velocity.x += rand(-10, 10);
+    }
+
+    // mouse push
+    if (collision(mouse, penger_origin.x, penger_origin.y, penger_width*scale, penger_height*scale)) {
+        v2 force = v2_diff(penger_pos, mouse);
+        force = v2_normalize(force);
+        force = v2_scale(force, 5);
+        velocity.x += force.x;
+        velocity.y += force.y;
     }
 
     // update pos avec velocity si pas de touche presser
@@ -128,11 +184,6 @@ void draw(float dt)
 
     rebondi(&penger_pos, scale);
 
-    // position du penger en haut a gauche de l'image
-    v2 penger_origin = {0};
-    penger_origin.x = penger_pos.x - penger_width*scale/2;
-    penger_origin.y = penger_pos.y - penger_height*scale/2;
-
     // dessine le penger sur le canva
     for (int y = 0; y < penger_height; y++) {
         for (int i = 0; i < penger_width; i++) {
@@ -147,6 +198,19 @@ void draw(float dt)
                     BUFFER[idx_y*width + idx_x] = penger_img[y][i];
                 }
             }
+        }
+    }
+
+    // draw hand
+    for (int y = 0; y < hand_height; y++) {
+        for (int x = 0; x < hand_width; x++) {
+            if (hand_img[y][x] <= 0x00FFFFFF) // pixel transparant
+                continue;
+            int idx_x = x + mouse.x;
+            int idx_y = y + mouse.y;
+            if (idx_x < 0 || idx_x >= width || idx_y < 0 || idx_y >= height)
+                continue;
+            BUFFER[idx_y*width + idx_x] = hand_img[y][x];
         }
     }
 }

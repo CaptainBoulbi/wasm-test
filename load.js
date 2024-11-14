@@ -17,6 +17,7 @@ window.onload = () => {
     var descale_but = document.getElementById("descaling");
     var scale_p = document.getElementById("scale");
     var reset_but = document.getElementById("reset");
+    var canvas = document.getElementById("demo-canvas");
     scale_p.innerText = "scale: " + scale;
     scale_but.onclick = () => {
         scale++;
@@ -28,6 +29,10 @@ window.onload = () => {
     }
     reset_but.onclick = () => {
         wasm_function('set_velocity')(0, 0);
+    }
+    canvas.onmousemove = (e) => {
+        var r = canvas.getBoundingClientRect();
+        wasm_function('set_mouse')(e.clientX - r.x, e.clientY - r.y);
     }
 };
 
@@ -51,6 +56,7 @@ const { instance } = await WebAssembly.instantiateStreaming(fetch("./app.wasm"),
     "env": make_environment({
         // importer les fonctions dans le wasm
         'random': Math.random,
+        'sqrtf': Math.sqrt,
         'get_scale': () => {return scale},
     })
 });
