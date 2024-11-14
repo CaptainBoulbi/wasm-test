@@ -1,6 +1,16 @@
 var scale = 7;
 
 var global_instance;
+var global_memory;
+
+function wasm_variable(name)
+{
+    return global_memory[global_instance.exports[name].value / 4];
+}
+function wasm_function(name)
+{
+    return global_instance.exports[name];
+}
 
 window.onload = () => {
     var scale_but = document.getElementById("scaling");
@@ -17,10 +27,13 @@ window.onload = () => {
         scale_p.innerText = "scale: " + scale;
     }
     reset_but.onclick = () => {
-        global_instance.exports.set_velocity(0, 0);
+        wasm_function('set_velocity')(0, 0);
     }
 };
 
+(async() => {
+
+// jsp, je l'ai pris de la: https://github.com/tsoding/olive.c
 function make_environment(...envs) {
     return new Proxy(envs, {
         get(target, prop, receiver) {
@@ -34,26 +47,27 @@ function make_environment(...envs) {
     });
 }
 
-(async() => {
-
 const { instance } = await WebAssembly.instantiateStreaming(fetch("./app.wasm"), {
     "env": make_environment({
+        // importer les fonctions dans le wasm
         'random': Math.random,
         'get_scale': () => {return scale},
     })
 });
 
-global_instance = instance;
-
 const memory = new Uint32Array(instance.exports.memory.buffer);
 
-const width = memory[instance.exports.width.value / 4];
-const height = memory[instance.exports.height.value / 4];
+global_instance = instance;
+global_memory = memory;
+
+const width = wasm_variable('width');
+const height = wasm_variable('height');
 
 const canvas = document.getElementById("demo-canvas");
 canvas.width = width;
 canvas.height = height;
 
+// recup image de la memoire du wasm
 const buffer_address = instance.exports.BUFFER.value;
 const image = new ImageData(
     new Uint8ClampedArray(
@@ -66,30 +80,30 @@ const image = new ImageData(
 
 const ctx = canvas.getContext("2d");
 
-instance.exports.init();
+wasm_function('init')();
 
 let prev = null;
 function first(timestamp) {
     prev = timestamp;
-    instance.exports.go(0.16);
+    wasm_function('draw')(0.16);
     window.requestAnimationFrame(loop);
 }
 function loop(timestamp) {
     const dt = timestamp - prev;
     prev = timestamp;
 
-    instance.exports.go(dt/1000);
+    wasm_function('draw')(dt/1000);
     ctx.putImageData(image, 0, 0);
     window.requestAnimationFrame(loop);
 }
 window.requestAnimationFrame(first);
 
 addEventListener('keydown', (e) => {
-    instance.exports.key_pressed(e.keyCode);
+    wasm_function('key_pressed')(e.keyCode);
 });
 
 addEventListener('keyup', (e) => {
-    instance.exports.key_released(e.keyCode);
+    wasm_function('key_released')(e.keyCode);
 });
 
 })()
