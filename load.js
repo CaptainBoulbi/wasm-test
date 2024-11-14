@@ -17,7 +17,7 @@ window.onload = () => {
         scale_p.innerText = "scale: " + scale;
     }
     reset_but.onclick = () => {
-        global_instance.exports.reset_velocity();
+        global_instance.exports.set_velocity(0, 0);
     }
 };
 

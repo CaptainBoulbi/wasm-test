@@ -52,9 +52,9 @@ void key_released(int key)
 
 v2 velocity = {0, 0};
 
-void reset_velocity(void)
+void set_velocity(float x, float y)
 {
-    velocity = (v2){0, 0};
+    velocity = (v2){x, y};
 }
 
 void rebondi(v2 *pos, int scale)

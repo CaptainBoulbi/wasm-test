@@ -26,7 +26,7 @@ int main(int argc, const char *argv[])
     for (int y = 0; y < height; y++) {
         printf("    ");
         for (int i = 0; i < width; i++) {
-            printf("0x%08X,", data[y*height + i]);
+            printf("0x%08X,", data[y*width + i]);
         }
         printf("\n");
     }
