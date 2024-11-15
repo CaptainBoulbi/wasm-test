@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Penger Party</title>
         <script src="load.js"></script>
         <style>
             #demo-canvas:hover {
@@ -10,8 +11,13 @@
                 width: 64px;
                 image-rendering: pixelated;
             }
+            h1 {
+                text-align: center;
+                font-size: 1.5em;
+                margin: 0px;
+            }
             @media screen and (min-width: calc(800px + calc(64px * 4))) {
-                body {
+                #css-bullshit {
                     content: "";
                     display: table;
                     clear: both;
@@ -24,27 +30,26 @@
                     float: right;
                     width: calc(100% - 800px - 25px);
                     position: absolute;
-                    top: 0px;
                     right: 0px;
                 }
             }
         </style>
     </head>
     <body>
-        <div id="left">
-            <canvas id="demo-canvas"></canvas>
-            <br>
-            <button id='descaling'>scale - 1</button>
-            <button id='scaling'>scale + 1</button>
-            <button id='reset'>reset velocity</button>
-            <br>
-            <p id='scale'></p>
-            <p>Press arrow key to move</p>
-            <p>Press space key to jump</p>
-            <p>Penger is afraid of your stinky hand</p>
+        <h1>Penger Party</h1>
+        <div id="css-bullshit">
+            <div id="left">
+                <canvas id="demo-canvas"></canvas>
+                <h3>Instructions:</h3>
+                <p>Press q, d or arrow key to move</p>
+                <p>Press shift key to slow down</p>
+                <p>Press space key to jump</p>
+                <p>Penger is afraid of your stinky hand</p>
+            </div>
+            <div id="right">
+                <h3>Choose your penger:</h3>
+            </div>
         </div>
-        <div id="right">
-            <h3>Choose your penger:</h3>
-        </div>
+        <h3>Made by a Penger Entousiast</h3>
     </body>
 </html>

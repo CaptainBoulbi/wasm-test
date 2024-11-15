@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ "$1" == "clear" ]]; then
+    rm -vfr museum.c pengers.h hand.c app.wasm png2c app.wat index.html
+    exit
+fi;
+
 export_sym="init draw key_pressed key_released set_velocity set_mouse BUFFER width height id"
 export_cmd=""
 for e in $export_sym; do

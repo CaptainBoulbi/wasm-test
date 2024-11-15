@@ -1,4 +1,4 @@
-var scale = 7;
+var scale = 2;
 
 var global_instance;
 var global_memory;
@@ -17,24 +17,8 @@ function wasm_function(name)
 }
 
 window.onload = () => {
-    var scale_but = document.getElementById("scaling");
-    var descale_but = document.getElementById("descaling");
-    var scale_p = document.getElementById("scale");
-    var reset_but = document.getElementById("reset");
     var canvas = document.getElementById("demo-canvas");
     var pengers_img = document.getElementsByClassName('penger-img');
-    scale_p.innerText = "scale: " + scale;
-    scale_but.onclick = () => {
-        scale++;
-        scale_p.innerText = "scale: " + scale;
-    }
-    descale_but.onclick = () => {
-        scale--;
-        scale_p.innerText = "scale: " + scale;
-    }
-    reset_but.onclick = () => {
-        wasm_function('set_velocity')(0, 0);
-    }
     canvas.onmousemove = (e) => {
         var r = canvas.getBoundingClientRect();
         wasm_function('set_mouse')(e.clientX - r.x, e.clientY - r.y);
@@ -115,7 +99,7 @@ window.requestAnimationFrame(first);
 
 addEventListener('keydown', (e) => {
     wasm_function('key_pressed')(e.keyCode);
-    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+    if(["Space","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
         e.preventDefault();
     }
 });

@@ -8,6 +8,7 @@
 
 #define EPSILON 0.000001f
 #define GRAVITY 9
+#define AIR_RESISTANCE 5
 
 const unsigned int width = 800;
 const unsigned int height = 600;
@@ -64,6 +65,8 @@ typedef enum Key {
     ARROW_RIGHT = 39,
     ARROW_UP = 38,
     ARROW_DOWN = 40,
+    D = 68,
+    Q = 81,
     KEY_COUNT,
 } Key;
 
@@ -79,6 +82,63 @@ void key_released(int key)
 {
     if (key < 0 || key >= KEY_COUNT) return;
     keys[key] = 0;
+}
+
+typedef struct Collision {
+    int x, y, width, height;
+} Collision;
+
+#define NB_COLLISIONS 10
+Collision collisions[NB_COLLISIONS] = {};
+
+Collision collision_union(Collision rec1, Collision rec2)
+{
+    Collision overlap = { 0 };
+
+    int left = (rec1.x > rec2.x)? rec1.x : rec2.x;
+    int right1 = rec1.x + rec1.width;
+    int right2 = rec2.x + rec2.width;
+    int right = (right1 < right2)? right1 : right2;
+    int top = (rec1.y > rec2.y)? rec1.y : rec2.y;
+    int bottom1 = rec1.y + rec1.height;
+    int bottom2 = rec2.y + rec2.height;
+    int bottom = (bottom1 < bottom2)? bottom1 : bottom2;
+
+    if ((left < right) && (top < bottom)) {
+        overlap.x = left;
+        overlap.y = top;
+        overlap.width = right - left;
+        overlap.height = bottom - top;
+    }
+
+    return overlap;
+}
+
+void collision_rec(Collision fix, int i, int scale)
+{
+    Collision col = collision_union(fix, (Collision) {
+            .x = penger_pos.x - pengers_width[id]*scale/2,
+            .y = penger_pos.y - pengers_height[id]*scale/2,
+            .width = pengers_width[id]*scale,
+            .height = pengers_height[id]*scale,
+            });
+    if (col.width == 0 && col.height == 0) return;
+    if (col.width == 1 && col.height == 1) return;
+
+    float div = -1.5;
+    if (col.width <= col.height) {
+        if (fix.x + fix.width == col.x + col.width)
+            penger_pos.x = fix.x + fix.width + pengers_width[id]*scale/2 + 1;
+        else if (fix.x == col.x)
+            penger_pos.x = col.x - pengers_width[id]*scale/2 + 1;
+        velocity.x /= div;
+    } else {
+        if (fix.y + fix.height == col.y + col.height)
+            penger_pos.y = fix.y + fix.height + pengers_height[id]*scale/2 + 1;
+        else if (fix.y == col.y)
+            penger_pos.y = col.y - pengers_height[id]*scale/2 + 1;
+        velocity.y /= div;
+    }
 }
 
 void set_velocity(float x, float y)
@@ -126,6 +186,37 @@ int collision(v2 point, int x, int y, int w, int h)
 void init()
 {
     pengers_init();
+    int col_id = 0;
+    collisions[col_id++] = (Collision) {
+        .x = 100,
+        .y = 450,
+        .width = 50,
+        .height = 100,
+    };
+    collisions[col_id++] = (Collision) {
+        .x = 150,
+        .y = 500,
+        .width = 500,
+        .height = 50,
+    };
+    collisions[col_id++] = (Collision) {
+        .x = 650,
+        .y = 450,
+        .width = 50,
+        .height = 100,
+    };
+    collisions[col_id++] = (Collision) {
+        .x = 280,
+        .y = 250,
+        .width = 75,
+        .height = 75,
+    };
+    collisions[col_id++] = (Collision) {
+        .x = 445,
+        .y = 250,
+        .width = 75,
+        .height = 75,
+    };
 }
 
 void draw(float dt)
@@ -138,9 +229,13 @@ void draw(float dt)
     penger_origin.y = penger_pos.y - pengers_height[id]*scale/2;
 
     // jump
-    if (keys[SPACE]) {
-        velocity.y += velocity.y < 0 ? -10 : 10;
-        velocity.x += rand(-10, 10);
+    static int jumped = 0;
+    if (keys[SPACE] && !jumped) {
+        jumped = 1;
+        velocity.y = -5;
+        velocity.x += rand(-2, 2);
+    } else if (!keys[SPACE]) {
+        jumped = 0;
     }
 
     // mouse push
@@ -152,42 +247,43 @@ void draw(float dt)
         velocity.y += force.y;
     }
 
-    // update pos avec velocity si pas de touche presser
-    if (!keys[ARROW_UP] && !keys[ARROW_DOWN]) {
-        velocity.y += GRAVITY * dt;
-        penger_pos.y += velocity.y;
-    }
-    if (!keys[ARROW_LEFT] && !keys[ARROW_RIGHT]) {
+    if ((!keys[ARROW_LEFT] || !keys[Q]) && (!keys[ARROW_RIGHT] || !keys[D])) {
         penger_pos.x += velocity.x;
     }
+    velocity.y += GRAVITY * dt;
+    penger_pos.y += velocity.y;
+    if (velocity.x <= -0.1)
+        velocity.x += AIR_RESISTANCE * dt;
+    else if (velocity.x >= 0.1)
+        velocity.x -= AIR_RESISTANCE * dt;
+    else velocity.x = 0;
+    penger_pos.x += velocity.x;
 
     // movement
-    float speed = 10.0f;
-    if ((keys[ARROW_UP] || keys[ARROW_DOWN]) && (keys[ARROW_LEFT] || keys[ARROW_RIGHT]))
-        speed = 6.324f; // sqrt(speed) * 2 with speed = 10
+    float speed = 100.0f * dt;
     if (keys[SHIFT])
         speed /= 2.0f;
 
-    if (keys[ARROW_RIGHT]) {
+    if (keys[ARROW_RIGHT] || keys[D]) {
         penger_pos.x += speed;
         if (velocity.x < 0) velocity.x *= -1;
-        else if (velocity.x >= -EPSILON) velocity.x = 1;
+        else if (velocity.x >= -EPSILON) velocity.x = speed;
     }
-    if (keys[ARROW_LEFT]) {
+    if (keys[ARROW_LEFT] || keys[Q]) {
         penger_pos.x -= speed;
         if (velocity.x > 0) velocity.x *= -1;
-        else if (velocity.x <= EPSILON) velocity.x = -1;
+        else if (velocity.x <= EPSILON) velocity.x = -speed;
     }
-    if (keys[ARROW_DOWN])
-        penger_pos.y += speed;
-    if (keys[ARROW_UP])
-        penger_pos.y -= speed;
 
     // background
     for (int i = 0; i < width * height; i++)
         BUFFER[i] = GREEN;
 
     rebondi(&penger_pos, scale);
+
+    for (int i = 0; i < NB_COLLISIONS; i++) {
+        collision_rec(collisions[i], i, scale);
+    }
 
     // dessine le penger sur le canva
     for (int y = 0; y < pengers_height[id]; y++) {
@@ -205,6 +301,18 @@ void draw(float dt)
                         continue;
                     BUFFER[idx_y*width + idx_x] = pengers_img[id][y*pengers_width[id] + i_for_reverse_pixel_rendering_it_s_craazy];
                 }
+            }
+        }
+    }
+
+    // draw collisions box
+    for (int i = 0; i < NB_COLLISIONS; i++) {
+        for (int y = collisions[i].y; y < collisions[i].y + collisions[i].height; y++) {
+            for (int x = collisions[i].x; x < collisions[i].x + collisions[i].width; x++) {
+                if ((y/2 + x/3)%8 < 4)
+                    BUFFER[y*width + x] = BLUE;
+                else
+                    BUFFER[y*width + x] = RED;
             }
         }
     }
