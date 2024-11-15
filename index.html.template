@@ -10,7 +10,7 @@
                 width: 64px;
                 image-rendering: pixelated;
             }
-            @media screen and (min-width: 1620px) {
+            @media screen and (min-width: calc(800px + calc(64px * 4))) {
                 body {
                     content: "";
                     display: table;
@@ -22,7 +22,10 @@
                 }
                 #right {
                     float: right;
-                    width: 50%;
+                    width: calc(100% - 800px - 25px);
+                    position: absolute;
+                    top: 0px;
+                    right: 0px;
                 }
             }
         </style>

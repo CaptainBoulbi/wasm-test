@@ -115,6 +115,9 @@ window.requestAnimationFrame(first);
 
 addEventListener('keydown', (e) => {
     wasm_function('key_pressed')(e.keyCode);
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
 });
 
 addEventListener('keyup', (e) => {
