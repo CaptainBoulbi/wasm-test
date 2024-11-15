@@ -19,20 +19,42 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    int file_name_len = strlen(img_path) - strlen(".png");
-    
-    printf("int %.*s_height = %d;\n", file_name_len, img_path, height);
-    printf("int %.*s_width = %d;\n", file_name_len, img_path, width);
-    printf("unsigned int %.*s_img[%d][%d] = {\n", file_name_len, img_path, height, width);
+    if (argc < 3) { // no id provided
+        int file_name_len = strlen(img_path) - strlen(".png");
 
-    for (int y = 0; y < height; y++) {
-        printf("    ");
-        for (int i = 0; i < width; i++) {
-            printf("0x%08X,", data[y*width + i]);
+        printf("int %.*s_height = %d;\n", file_name_len, img_path, height);
+        printf("int %.*s_width = %d;\n", file_name_len, img_path, width);
+        printf("unsigned int %.*s_img[%d][%d] = {\n", file_name_len, img_path, height, width);
+
+        for (int y = 0; y < height; y++) {
+            printf("    ");
+            for (int i = 0; i < width; i++) {
+                printf("0x%08X,", data[y*width + i]);
+            }
+            printf("\n");
         }
-        printf("\n");
-    }
 
-    printf("};\n");
+        printf("};\n");
+    } else { // id provided
+        int id = atoi(argv[2]);
+
+        printf("unsigned int penger_img_%d[] = {\n", id);
+
+        for (int y = 0; y < height; y++) {
+            printf("    ");
+            for (int i = 0; i < width; i++) {
+                printf("0x%08X,", data[y*width + i]);
+            }
+            printf("\n");
+        }
+
+        printf("};\n");
+
+        printf("void penger_init_%d(void) {\n", id);
+        printf("    pengers_height[%d] = %d;\n", id, height);
+        printf("    pengers_width[%d] = %d;\n", id, width);
+        printf("    pengers_img[%d] = penger_img_%d;\n", id, id);
+        printf("}\n");
+    }
 }
 

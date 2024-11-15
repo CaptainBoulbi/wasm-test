@@ -7,6 +7,10 @@ function wasm_variable(name)
 {
     return global_memory[global_instance.exports[name].value / 4];
 }
+function wasm_set_variable(name, val)
+{
+    return global_memory[global_instance.exports[name].value / 4] = val;
+}
 function wasm_function(name)
 {
     return global_instance.exports[name];
@@ -18,6 +22,7 @@ window.onload = () => {
     var scale_p = document.getElementById("scale");
     var reset_but = document.getElementById("reset");
     var canvas = document.getElementById("demo-canvas");
+    var pengers_img = document.getElementsByClassName('penger-img');
     scale_p.innerText = "scale: " + scale;
     scale_but.onclick = () => {
         scale++;
@@ -33,6 +38,9 @@ window.onload = () => {
     canvas.onmousemove = (e) => {
         var r = canvas.getBoundingClientRect();
         wasm_function('set_mouse')(e.clientX - r.x, e.clientY - r.y);
+    }
+    for (var i = 0; i < pengers_img.length; i++) {
+        pengers_img[i].onclick = (e) => {wasm_set_variable('id', e.target.getAttribute('penger-id'))}
     }
 };
 
@@ -90,6 +98,7 @@ wasm_function('init')();
 
 let prev = null;
 function first(timestamp) {
+    wasm_set_variable('id', Math.random() * document.getElementsByClassName('penger-img').length);
     prev = timestamp;
     wasm_function('draw')(0.16);
     window.requestAnimationFrame(loop);

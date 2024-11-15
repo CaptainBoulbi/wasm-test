@@ -1,4 +1,4 @@
-#include "penger.c"
+#include "pengers.h"
 #include "hand.c"
 
 #define GREEN 0xff00ff00
@@ -11,6 +11,7 @@
 const unsigned int width = 800;
 const unsigned int height = 600;
 unsigned int BUFFER[width * height];
+int id = 0;
 
 // importer depuis js
 int get_scale(void);
@@ -97,20 +98,20 @@ int rand(int min, int max)
 void rebondi(v2 *pos, int scale)
 {
     float div = -1.5;
-    if (pos->x - penger_width*scale/2 < 0) {
-        pos->x = penger_width*scale/2;
+    if (pos->x - pengers_width[id]*scale/2 < 0) {
+        pos->x = pengers_width[id]*scale/2;
         velocity.x /= div;
     }
-    if (pos->y - penger_height*scale/2 < 0) {
-        pos->y = penger_height*scale/2;
+    if (pos->y - pengers_height[id]*scale/2 < 0) {
+        pos->y = pengers_height[id]*scale/2;
         velocity.y /= div;
     }
-    if (pos->x + penger_width*scale/2 >= width) {
-        pos->x = width - penger_width*scale/2;
+    if (pos->x + pengers_width[id]*scale/2 >= width) {
+        pos->x = width - pengers_width[id]*scale/2;
         velocity.x /= div;
     }
-    if (pos->y + penger_height*scale/2 >= height) {
-        pos->y = height - penger_height*scale/2;
+    if (pos->y + pengers_height[id]*scale/2 >= height) {
+        pos->y = height - pengers_height[id]*scale/2;
         velocity.y /= div;
     }
 }
@@ -123,6 +124,7 @@ int collision(v2 point, int x, int y, int w, int h)
 
 void init()
 {
+    pengers_init();
 }
 
 void draw(float dt)
@@ -131,8 +133,8 @@ void draw(float dt)
 
     // position du penger en haut a gauche de l'image
     v2 penger_origin = {0};
-    penger_origin.x = penger_pos.x - penger_width*scale/2;
-    penger_origin.y = penger_pos.y - penger_height*scale/2;
+    penger_origin.x = penger_pos.x - pengers_width[id]*scale/2;
+    penger_origin.y = penger_pos.y - pengers_height[id]*scale/2;
 
     // jump
     if (keys[SPACE]) {
@@ -141,7 +143,7 @@ void draw(float dt)
     }
 
     // mouse push
-    if (collision(mouse, penger_origin.x, penger_origin.y, penger_width*scale, penger_height*scale)) {
+    if (collision(mouse, penger_origin.x, penger_origin.y, pengers_width[id]*scale, pengers_height[id]*scale)) {
         v2 force = v2_diff(penger_pos, mouse);
         force = v2_normalize(force);
         force = v2_scale(force, 5);
@@ -185,9 +187,9 @@ void draw(float dt)
     rebondi(&penger_pos, scale);
 
     // dessine le penger sur le canva
-    for (int y = 0; y < penger_height; y++) {
-        for (int i = 0; i < penger_width; i++) {
-            if (penger_img[y][i] <= 0x00FFFFFF) // pixel transparant
+    for (int y = 0; y < pengers_height[id]; y++) {
+        for (int i = 0; i < pengers_width[id]; i++) {
+            if (pengers_img[id][y*pengers_width[id] + i] <= 0x00FFFFFF) // pixel transparant
                 continue;
             for (int s1 = 0; s1 < scale; s1++) {
                 for (int s2 = 0; s2 < scale; s2++) {
@@ -195,7 +197,7 @@ void draw(float dt)
                     int idx_y = penger_origin.y + y*scale+s2;
                     if (idx_x < 0 || idx_x >= width || idx_y < 0 || idx_y >= height)
                         continue;
-                    BUFFER[idx_y*width + idx_x] = penger_img[y][i];
+                    BUFFER[idx_y*width + idx_x] = pengers_img[id][y*pengers_width[id] + i];
                 }
             }
         }
