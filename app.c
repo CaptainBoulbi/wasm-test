@@ -7,7 +7,7 @@
 #define BLACK 0xff000000
 
 #define EPSILON 0.000001f
-#define GRAVITY 9
+#define GRAVITY 12
 #define AIR_RESISTANCE 5
 
 const unsigned int width = 800;
@@ -125,7 +125,7 @@ void collision_rec(Collision fix, int i, int scale)
     if (col.width == 0 && col.height == 0) return;
     if (col.width == 1 && col.height == 1) return;
 
-    float div = -1.5;
+    float div = -1.8;
     if (col.width <= col.height) {
         if (fix.x + fix.width == col.x + col.width)
             penger_pos.x = fix.x + fix.width + pengers_width[id]*scale/2 + 1;
@@ -158,7 +158,7 @@ int rand(int min, int max)
 
 void rebondi(v2 *pos, int scale)
 {
-    float div = -1.5;
+    float div = -1.8;
     if (pos->x - pengers_width[id]*scale/2 < 0) {
         pos->x = pengers_width[id]*scale/2;
         velocity.x /= div;
