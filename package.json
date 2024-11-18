@@ -1,0 +1,23 @@
+{
+  "name": "webassembly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "load.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CaptainBoulbi/wasm-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CaptainBoulbi/wasm-test/issues"
+  },
+  "homepage": "https://github.com/CaptainBoulbi/wasm-test#readme",
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

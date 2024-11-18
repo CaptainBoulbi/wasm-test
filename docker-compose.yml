@@ -3,8 +3,10 @@ version: "3"
 services:
   web:
     container_name: "web"
-    image: "httpd"
+    image: "node"
     ports:
       - "6969:80"
+      - "8080:8080"
     volumes:
-      - ".:/usr/local/apache2/htdocs/"
+      - ".:/app"
+    command: "node /app/server.js"

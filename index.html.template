@@ -11,6 +11,9 @@
                 width: 64px;
                 image-rendering: pixelated;
             }
+            .players-img {
+                margin-right: 10px;
+            }
             h1 {
                 text-align: center;
                 font-size: 1.5em;
@@ -47,6 +50,14 @@
                 <p>Penger is afraid of your stinky hand</p>
             </div>
             <div id="right">
+                <h3>Multiplayer:</h3>
+                <p>
+                    play with the pseudo name:
+                    <input id="pseudo" placeholder="Penger Lover" />
+                    <button id="play">Play</button>
+                </p>
+                <p>Players:</p>
+                <ul id="players"></ul>
                 <h3>Choose your penger:</h3>
             </div>
         </div>

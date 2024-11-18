@@ -1,7 +1,45 @@
-var scale = 2;
+const connection = new WebSocket('ws://localhost:8080');
+connection.onmessage = (e) => {
+    var req = JSON.parse(e.data);
+    if (req.name == 'pseudo') {
+        document.getElementById('players').innerHTML = req.value;
+        var pengers_img = document.getElementsByClassName('penger-img');
+        var list = [];
+        for (var i = 0; i < pengers_img.length; i++) {
+            list[list.length] = pengers_img[i].src;
+        }
+        var players_img = document.getElementsByClassName('players-img');
+        for (var i = 0; i < players_img.length; i++) {
+            players_img[i].src = list[players_img[i].getAttribute('penger-id')];
+        }
+    }
+};
 
 var global_instance;
 var global_memory;
+
+var scale = 2;
+
+window.onload = () => {
+    var canvas = document.getElementById("demo-canvas");
+    canvas.onmousemove = (e) => {
+        var r = canvas.getBoundingClientRect();
+        wasm_function('set_mouse')(e.clientX - r.x, e.clientY - r.y);
+    }
+    var pengers_img = document.getElementsByClassName('penger-img');
+    for (var i = 0; i < pengers_img.length; i++) {
+        pengers_img[i].onclick = (e) => {
+            var id = e.target.getAttribute('penger-id');
+            wasm_set_variable('id', id)
+            connection.send('{"name": "id", "value": "'+id+'"}');
+        };
+    }
+    var play = document.getElementById('play');
+    play.onclick = () => {
+        var pseudo = document.getElementById('pseudo').value;
+        connection.send('{"name": "pseudo", "value": "'+pseudo+'"}');
+    };
+};
 
 function wasm_variable(name)
 {
@@ -15,18 +53,6 @@ function wasm_function(name)
 {
     return global_instance.exports[name];
 }
-
-window.onload = () => {
-    var canvas = document.getElementById("demo-canvas");
-    var pengers_img = document.getElementsByClassName('penger-img');
-    canvas.onmousemove = (e) => {
-        var r = canvas.getBoundingClientRect();
-        wasm_function('set_mouse')(e.clientX - r.x, e.clientY - r.y);
-    }
-    for (var i = 0; i < pengers_img.length; i++) {
-        pengers_img[i].onclick = (e) => {wasm_set_variable('id', e.target.getAttribute('penger-id'))}
-    }
-};
 
 (async() => {
 
@@ -82,7 +108,9 @@ wasm_function('init')();
 
 let prev = null;
 function first(timestamp) {
-    wasm_set_variable('id', Math.random() * document.getElementsByClassName('penger-img').length);
+    var id = Math.floor(Math.random() * document.getElementsByClassName('penger-img').length);
+    wasm_set_variable('id', id);
+    connection.send('{"name": "id", "value": "'+id+'"}');
     prev = timestamp;
     wasm_function('draw')(0.16);
     window.requestAnimationFrame(loop);
@@ -97,7 +125,12 @@ function loop(timestamp) {
 }
 window.requestAnimationFrame(first);
 
+var is_on_canva = false;
+document.getElementById("demo-canvas").addEventListener("mouseenter", () => {is_on_canva = true;});
+document.getElementById("demo-canvas").addEventListener("mouseout", () => {is_on_canva = false;});
+
 addEventListener('keydown', (e) => {
+    if (!is_on_canva) return;
     wasm_function('key_pressed')(e.keyCode);
     if(["Space","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
         e.preventDefault();
