@@ -20,3 +20,5 @@ or
 ```console
 docker-compose up -d
 ```
+
+then go to [http://localhost:6969](http://localhost:6969)
