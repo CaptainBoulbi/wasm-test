@@ -114,7 +114,7 @@ Collision collision_union(Collision rec1, Collision rec2)
     return overlap;
 }
 
-void collision_rec(Collision fix, int i, int scale)
+Collision collision_rec(Collision fix, int i, int scale)
 {
     Collision col = collision_union(fix, (Collision) {
             .x = penger_pos.x - pengers_width[id]*scale/2,
@@ -122,23 +122,24 @@ void collision_rec(Collision fix, int i, int scale)
             .width = pengers_width[id]*scale,
             .height = pengers_height[id]*scale,
             });
-    if (col.width == 0 && col.height == 0) return;
-    if (col.width == 1 && col.height == 1) return;
+    if (col.width == 0 && col.height == 0) return col;
+    if (col.width == 1 && col.height == 1) return col;
 
     float div = -1.8;
     if (col.width <= col.height) {
         if (fix.x + fix.width == col.x + col.width)
-            penger_pos.x = fix.x + fix.width + pengers_width[id]*scale/2 + 1;
+            penger_pos.x = fix.x + fix.width + pengers_width[id]*scale/2;
         else if (fix.x == col.x)
             penger_pos.x = col.x - pengers_width[id]*scale/2 + 1;
         velocity.x /= div;
     } else {
         if (fix.y + fix.height == col.y + col.height)
-            penger_pos.y = fix.y + fix.height + pengers_height[id]*scale/2 + 1;
+            penger_pos.y = fix.y + fix.height + pengers_height[id]*scale/2;
         else if (fix.y == col.y)
             penger_pos.y = col.y - pengers_height[id]*scale/2 + 1;
         velocity.y /= div;
     }
+    return col;
 }
 
 void set_velocity(float x, float y)
@@ -189,31 +190,31 @@ void init()
     int col_id = 0;
     collisions[col_id++] = (Collision) {
         .x = 100,
-        .y = 450,
+        .y = 400,
         .width = 50,
         .height = 100,
     };
     collisions[col_id++] = (Collision) {
         .x = 150,
-        .y = 500,
+        .y = 450,
         .width = 500,
         .height = 50,
     };
     collisions[col_id++] = (Collision) {
         .x = 650,
-        .y = 450,
+        .y = 400,
         .width = 50,
         .height = 100,
     };
     collisions[col_id++] = (Collision) {
         .x = 280,
-        .y = 250,
+        .y = 200,
         .width = 75,
         .height = 75,
     };
     collisions[col_id++] = (Collision) {
         .x = 445,
-        .y = 250,
+        .y = 200,
         .width = 75,
         .height = 75,
     };
@@ -250,6 +251,8 @@ void draw(float dt)
     if ((!keys[ARROW_LEFT] || !keys[Q]) && (!keys[ARROW_RIGHT] || !keys[D])) {
         penger_pos.x += velocity.x;
     }
+    if (id == 28) // fatger id
+        velocity.y += GRAVITY * dt;
     velocity.y += GRAVITY * dt;
     penger_pos.y += velocity.y;
     if (velocity.x <= -0.1)
@@ -260,18 +263,25 @@ void draw(float dt)
     penger_pos.x += velocity.x;
 
     // movement
+    int x_collide = 0;
     float speed = 100.0f * dt;
     if (keys[SHIFT])
         speed /= 2.0f;
 
     if (keys[ARROW_RIGHT] || keys[D]) {
         penger_pos.x += speed;
-        if (velocity.x < 0) velocity.x *= -1;
+        if (velocity.x < 0) {
+            velocity.x *= -1;
+            x_collide = 1;
+        }
         else if (velocity.x >= -EPSILON) velocity.x = speed;
     }
     if (keys[ARROW_LEFT] || keys[Q]) {
         penger_pos.x -= speed;
-        if (velocity.x > 0) velocity.x *= -1;
+        if (velocity.x > 0) {
+            velocity.x *= -1;
+            x_collide = 1;
+        }
         else if (velocity.x <= EPSILON) velocity.x = -speed;
     }
 
@@ -282,17 +292,27 @@ void draw(float dt)
     rebondi(&penger_pos, scale);
 
     for (int i = 0; i < NB_COLLISIONS; i++) {
-        collision_rec(collisions[i], i, scale);
+        Collision col = collision_rec(collisions[i], i, scale);
+        x_collide = x_collide || (col.height > 1);
     }
 
     // dessine le penger sur le canva
     for (int y = 0; y < pengers_height[id]; y++) {
         for (int i = 0; i < pengers_width[id]; i++) {
-            int i_for_reverse_pixel_rendering_it_s_craazy = i;
-            if (velocity.x < EPSILON)
+            int i_for_reverse_pixel_rendering_it_s_craazy = 0;
+            static int last_dir = 1;
+            if ((velocity.x < -EPSILON && !x_collide) || last_dir == -1) {
                 i_for_reverse_pixel_rendering_it_s_craazy = pengers_width[id]-i-1;
+                last_dir = -1;
+            }
+            if ((velocity.x > EPSILON && !x_collide) || last_dir == 1) {
+                i_for_reverse_pixel_rendering_it_s_craazy = i;
+                last_dir = 1;
+            }
+
             if (pengers_img[id][y*pengers_width[id] + i_for_reverse_pixel_rendering_it_s_craazy] <= 0x00FFFFFF) // pixel transparant
                 continue;
+
             for (int s1 = 0; s1 < scale; s1++) {
                 for (int s2 = 0; s2 < scale; s2++) {
                     int idx_x = penger_origin.x + i*scale+s1;
