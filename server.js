@@ -2,9 +2,8 @@ const fs = require('fs');
 const http = require("http");
 const ws = require('ws');
 
-const HTTP_PORT = 80;
-const WS_PORT = 8080;
-const DIR = "/app";
+const HTTP_PORT = 6969;
+const WS_PORT = 4242;
 
 function update_player_list()
 {
@@ -19,28 +18,28 @@ const requestListener = function (req, res) {
     if (url == "/" || url == "/index.html") {
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);
-        res.end(fs.readFileSync(DIR + "/index.html"));
+        res.end(fs.readFileSync("./index.html"));
         return;
     }
 
     if (url == "/app.wasm") {
         res.setHeader("Content-Type", "application/wasm");
         res.writeHead(200);
-        res.end(fs.readFileSync(DIR + url));
+        res.end(fs.readFileSync("." + url));
         return;
     }
 
     if (url == "/load.js") {
 	    res.setHeader("Content-Type", "text/javascript");
         res.writeHead(200);
-        res.end(fs.readFileSync(DIR + url));
+        res.end(fs.readFileSync("." + url));
         return;
     }
 
     if (url.startsWith("/museum/")) {
 	    res.setHeader("Content-Type", "image/png");
         res.writeHead(200);
-        res.end(fs.readFileSync(DIR + url));
+        res.end(fs.readFileSync("." + url));
         return;
     }
 

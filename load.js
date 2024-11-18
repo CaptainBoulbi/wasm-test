@@ -1,4 +1,4 @@
-const connection = new WebSocket('ws://localhost:8080');
+const connection = new WebSocket('ws://localhost:4242');
 connection.onmessage = (e) => {
     var req = JSON.parse(e.data);
     if (req.name == 'pseudo') {
@@ -35,7 +35,8 @@ window.onload = () => {
         };
     }
     var play = document.getElementById('play');
-    play.onclick = () => {
+    var pseudo = document.getElementById('pseudo');
+    pseudo.onchange = play.onclick = () => {
         var pseudo = document.getElementById('pseudo').value;
         connection.send('{"name": "pseudo", "value": "'+pseudo+'"}');
     };
