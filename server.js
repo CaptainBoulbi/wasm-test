@@ -8,8 +8,13 @@ const WS_PORT = 4242;
 function update_player_list()
 {
     var list = "";
-    sockets.forEach((s) => { if (s.game.pseudo == undefined || s.game.pseudo == "") return; list += "<li><img class='players-img' penger-id='"+s.game.id+"' src='museum/Penger.png'>" + s.game.pseudo + "</li>"; });
-    sockets.forEach((s) => { s.send('{"name": "pseudo", "value": "'+list+'"}'); });
+    sockets.forEach((s) => {
+        if (s.game.pseudo == undefined || s.game.pseudo == "") return;
+        list += "<li><img class='players-img' penger-id='"+s.game.id+"' src='museum/Penger.png'>" + s.game.pseudo + "</li>";
+    });
+    sockets.forEach((s) => {
+        s.send('{"name": "pseudo", "value": "'+list+'"}');
+    });
 }
 
 const requestListener = function (req, res) {
@@ -59,14 +64,13 @@ var sockets = [];
 ws_server.on('connection', (socket) => {
     socket.game = {};
     sockets.push(socket);
-    console.log("connect: ", sockets.length );
+    console.log("connect: ", sockets.length);
 
     socket.on('message', (msg) => {
         var msg_str = Buffer.from(msg).toString('latin1');
         var req = JSON.parse(msg_str);
         socket.game[req.name] = req.value;
         update_player_list();
-        console.log(socket.game);
     });
 
     socket.on('close', () => {
