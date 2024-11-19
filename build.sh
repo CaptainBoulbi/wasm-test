@@ -5,7 +5,7 @@ if [[ "$1" == "clear" ]]; then
     exit
 fi;
 
-export_sym="init draw key_pressed key_released set_velocity set_mouse get_pos_x get_pos_y draw_player deco_player BUFFER width height id nb_players dir"
+export_sym="init draw key_pressed key_released set_velocity set_mouse get_pos_x get_pos_y draw_player deco_player reset_collisions add_collisions BUFFER width height id nb_players dir"
 export_cmd=""
 for e in $export_sym; do
     export_cmd="$export_cmd -Wl,--export=$e";
@@ -31,7 +31,7 @@ id=0
 for p in $(ls museum); do
     file=$(echo $p | sed "s/\.png$//g")
     ./png2c "museum/"$p $id > museum.c/$file.c
-    pengers_html+=$'            <img src="museum/'$p'" class="penger-img" penger-id="'$id'"></img>\n'
+    pengers_html+=$'                <img src="museum/'$p'" class="penger-img" penger-id="'$id'"></img>\n'
     pengers_include+='#include "museum.c/'$file$'.c"\n'
     ((id=id+1))
 done

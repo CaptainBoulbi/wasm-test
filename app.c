@@ -138,6 +138,7 @@ typedef struct Collision {
 
 #define NB_COLLISIONS 10
 Collision collisions[NB_COLLISIONS] = {};
+int nb_collisions = 0;
 
 Collision collision_union(Collision rec1, Collision rec2)
 {
@@ -190,6 +191,21 @@ Collision collision_rec(Collision fix, int i, int scale)
     return col;
 }
 
+void reset_collisions()
+{
+    nb_collisions = 0;
+}
+void add_collisions(int x, int y, int width, int height)
+{
+    if (nb_collisions >= NB_COLLISIONS) return;
+    collisions[nb_collisions++] = (Collision) {
+        .x = x,
+        .y = y,
+        .width = width,
+        .height = height,
+    };
+}
+
 void set_velocity(float x, float y)
 {
     velocity = (v2){x, y};
@@ -235,32 +251,31 @@ int collision(v2 point, int x, int y, int w, int h)
 void init()
 {
     pengers_init();
-    int col_id = 0;
-    collisions[col_id++] = (Collision) {
+    collisions[nb_collisions++] = (Collision) {
         .x = 100,
         .y = 400,
         .width = 50,
         .height = 100,
     };
-    collisions[col_id++] = (Collision) {
+    collisions[nb_collisions++] = (Collision) {
         .x = 150,
         .y = 450,
         .width = 500,
         .height = 50,
     };
-    collisions[col_id++] = (Collision) {
+    collisions[nb_collisions++] = (Collision) {
         .x = 650,
         .y = 400,
         .width = 50,
         .height = 100,
     };
-    collisions[col_id++] = (Collision) {
+    collisions[nb_collisions++] = (Collision) {
         .x = 280,
         .y = 200,
         .width = 75,
         .height = 75,
     };
-    collisions[col_id++] = (Collision) {
+    collisions[nb_collisions++] = (Collision) {
         .x = 445,
         .y = 200,
         .width = 75,
@@ -340,7 +355,7 @@ void draw(float dt)
 
     rebondi(&penger_pos, scale);
 
-    for (int i = 0; i < NB_COLLISIONS; i++) {
+    for (int i = 0; i < nb_collisions; i++) {
         Collision col = collision_rec(collisions[i], i, scale);
         x_collide = x_collide || (col.height > 1);
     }
@@ -403,7 +418,7 @@ void draw(float dt)
     }
 
     // draw collisions box
-    for (int i = 0; i < NB_COLLISIONS; i++) {
+    for (int i = 0; i < nb_collisions; i++) {
         for (int y = collisions[i].y; y < collisions[i].y + collisions[i].height; y++) {
             for (int x = collisions[i].x; x < collisions[i].x + collisions[i].width; x++) {
                 if ((y/2 + x/3)%8 < 4)

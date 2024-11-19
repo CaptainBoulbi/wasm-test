@@ -50,7 +50,6 @@ const connection = new WebSocket(document.URL.replace('http', 'ws').replace('696
 connection.onopen = (e) => { console.log("connection to server opened"); };
 connection.onmessage = (e) => {
     var req = JSON.parse(e.data);
-    console.log(req);
     if (req.name == 'pseudo') {
         if (req.value != "") is_connected = true;
         document.getElementById('players').innerHTML = req.value;
