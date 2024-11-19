@@ -1,19 +1,4 @@
-const connection = new WebSocket('ws://localhost:4242');
-connection.onmessage = (e) => {
-    var req = JSON.parse(e.data);
-    if (req.name == 'pseudo') {
-        document.getElementById('players').innerHTML = req.value;
-        var pengers_img = document.getElementsByClassName('penger-img');
-        var list = [];
-        for (var i = 0; i < pengers_img.length; i++) {
-            list[list.length] = pengers_img[i].src;
-        }
-        var players_img = document.getElementsByClassName('players-img');
-        for (var i = 0; i < players_img.length; i++) {
-            players_img[i].src = list[players_img[i].getAttribute('penger-id')];
-        }
-    }
-};
+var is_connected = false;
 
 var global_instance;
 var global_memory;
@@ -31,13 +16,18 @@ window.onload = () => {
         pengers_img[i].onclick = (e) => {
             var id = e.target.getAttribute('penger-id');
             wasm_set_variable('id', id)
-            connection.send('{"name": "id", "value": "'+id+'"}');
+            connection.send('{"name": "id", "value": '+id+'}');
         };
     }
     var play = document.getElementById('play');
     var pseudo = document.getElementById('pseudo');
     pseudo.onchange = play.onclick = () => {
         var pseudo = document.getElementById('pseudo').value;
+        if (pseudo == "") {
+            is_connected = false;
+            wasm_set_variable('nb_players', 0);
+            document.getElementById('players').innerHTML = "Not connected";
+        }
         connection.send('{"name": "pseudo", "value": "'+pseudo+'"}');
     };
 };
@@ -54,6 +44,62 @@ function wasm_function(name)
 {
     return global_instance.exports[name];
 }
+
+const connection = new WebSocket(document.URL.replace('http', 'ws').replace('6969', '4242'));
+// const connection = new WebSocket('ws://localhost:4242');
+connection.onopen = (e) => { console.log("connection to server opened"); };
+connection.onmessage = (e) => {
+    var req = JSON.parse(e.data);
+    console.log(req);
+    if (req.name == 'pseudo') {
+        if (req.value != "") is_connected = true;
+        document.getElementById('players').innerHTML = req.value;
+        var pengers_img = document.getElementsByClassName('penger-img');
+        var list = [];
+        for (var i = 0; i < pengers_img.length; i++) {
+            list[list.length] = pengers_img[i].src;
+        }
+        var players_img = document.getElementsByClassName('players-img');
+        for (var i = 0; i < players_img.length; i++) {
+            players_img[i].src = list[players_img[i].getAttribute('penger-id')];
+        }
+    }
+    else if (req.name == "rid") {
+        my_rid = req.value;
+    }
+    else if (req.name == "pos") {
+        var players = req.value;
+        for (var i = 0; i < players.length; i++) {
+            var player = players[i];
+            if (player.rid == my_rid) continue;
+            wasm_function('draw_player')(player.rid, player.id, player.x, player.y, player.dir);
+        }
+    }
+    else if (req.name == "disconnect") {
+        wasm_function('deco_player')(req.value);
+    }
+};
+connection.onclose = (e) => {
+    console.log("connection to server closed");
+    is_connected = false;
+    wasm_set_variable('nb_players', 0);
+    document.getElementById('players').innerHTML = "Not connected";
+};
+
+var update_time_ms = 100;
+function send_pos()
+{
+    if (is_connected) {
+        var rep = {};
+        rep.name = "pos";
+        rep.x = wasm_function("get_pos_x")();
+        rep.y = wasm_function("get_pos_y")();
+        rep.dir = wasm_variable("dir");
+        connection.send(JSON.stringify(rep));
+    }
+    setTimeout(send_pos, update_time_ms);
+}
+setTimeout(send_pos, update_time_ms);
 
 (async() => {
 
@@ -111,7 +157,7 @@ let prev = null;
 function first(timestamp) {
     var id = Math.floor(Math.random() * document.getElementsByClassName('penger-img').length);
     wasm_set_variable('id', id);
-    connection.send('{"name": "id", "value": "'+id+'"}');
+    connection.send('{"name": "id", "value": '+id+'}');
     prev = timestamp;
     wasm_function('draw')(0.16);
     window.requestAnimationFrame(loop);

@@ -14,6 +14,7 @@ const unsigned int width = 800;
 const unsigned int height = 600;
 unsigned int BUFFER[width * height];
 int id = 0;
+int dir = 0;
 
 // importer depuis js
 int get_scale(void);
@@ -28,6 +29,53 @@ typedef struct v2 {
 v2 penger_pos = {width/2, height/2};
 v2 velocity = {0, 0};
 v2 mouse = {0, 0};
+
+float get_pos_x(void)
+{
+    return penger_pos.x - pengers_width[id];
+}
+float get_pos_y(void)
+{
+    return penger_pos.y - pengers_height[id];
+}
+
+typedef struct Player {
+    int rid, id, x, y, dir;
+} Player;
+
+#define MAX_PLAYERS 20
+Player players[MAX_PLAYERS] = {0};
+int nb_players = 0;
+
+void deco_player(int rid)
+{
+    for (int i = 0; i < nb_players; i++) {
+        if (players[i].rid == rid) {
+            players[i].rid = -1;
+            return;
+        }
+    }
+}
+
+void draw_player(int rid, int id, int x, int y, int dir)
+{
+    if (nb_players >= MAX_PLAYERS) return;
+    for (int i = 0; i < nb_players; i++) {
+        if (players[i].rid == rid) {
+            players[i].id = id;
+            players[i].x = x;
+            players[i].y = y;
+            players[i].dir = dir;
+            return;
+        }
+    }
+    players[nb_players].rid = rid;
+    players[nb_players].id = id;
+    players[nb_players].x = x;
+    players[nb_players].y = y;
+    players[nb_players].dir = dir;
+    nb_players++;
+}
 
 v2 v2_diff(v2 vec1, v2 vec2)
 {
@@ -252,8 +300,9 @@ void draw(float dt)
         penger_pos.x += velocity.x;
     }
     if (id == 28) // fatger id
+        velocity.y += GRAVITY * dt * 7;
+    else
         velocity.y += GRAVITY * dt;
-    velocity.y += GRAVITY * dt;
     penger_pos.y += velocity.y;
     if (velocity.x <= -0.1)
         velocity.x += AIR_RESISTANCE * dt;
@@ -296,6 +345,33 @@ void draw(float dt)
         x_collide = x_collide || (col.height > 1);
     }
 
+    // dessine le penger des autres joueur
+    for (int p = 0; p < nb_players; p ++) {
+        Player player = players[p];
+        if (player.rid == -1) continue;
+        int scale = 2;
+        for (int y = 0; y < pengers_height[player.id]; y++) {
+            for (int i = 0; i < pengers_width[player.id]; i++) {
+                int real_i = i;
+                if (player.dir == -1)
+                    real_i = pengers_width[player.id]-i-1;
+
+                if (pengers_img[player.id][y*pengers_width[player.id] + real_i] <= 0x00FFFFFF) // pixel transparant
+                    continue;
+
+                for (int s1 = 0; s1 < scale; s1++) {
+                    for (int s2 = 0; s2 < scale; s2++) {
+                        int idx_x = player.x + i*scale+s1;
+                        int idx_y = player.y + y*scale+s2;
+                        if (idx_x < 0 || idx_x >= width || idx_y < 0 || idx_y >= height)
+                            continue;
+                        BUFFER[idx_y*width + idx_x] = pengers_img[player.id][y*pengers_width[player.id] + real_i];
+                    }
+                }
+            }
+        }
+    }
+
     // dessine le penger sur le canva
     for (int y = 0; y < pengers_height[id]; y++) {
         for (int i = 0; i < pengers_width[id]; i++) {
@@ -309,6 +385,7 @@ void draw(float dt)
                 i_for_reverse_pixel_rendering_it_s_craazy = i;
                 last_dir = 1;
             }
+            dir = last_dir;
 
             if (pengers_img[id][y*pengers_width[id] + i_for_reverse_pixel_rendering_it_s_craazy] <= 0x00FFFFFF) // pixel transparant
                 continue;

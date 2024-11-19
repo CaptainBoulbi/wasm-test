@@ -5,7 +5,7 @@ if [[ "$1" == "clear" ]]; then
     exit
 fi;
 
-export_sym="init draw key_pressed key_released set_velocity set_mouse BUFFER width height id"
+export_sym="init draw key_pressed key_released set_velocity set_mouse get_pos_x get_pos_y draw_player deco_player BUFFER width height id nb_players dir"
 export_cmd=""
 for e in $export_sym; do
     export_cmd="$export_cmd -Wl,--export=$e";
@@ -53,6 +53,6 @@ rm pengers_image.html.temp
 
 ./png2c "hand.png" > hand.c
 
-clang -O2 --target=wasm32 -fno-builtin -nostdlib --no-standard-libraries -Wl,--no-entry $export_cmd -Wl,--allow-undefined -o $f.wasm $a
+clang -O3 --target=wasm32 -fno-builtin -nostdlib --no-standard-libraries -Wl,--no-entry $export_cmd -Wl,--allow-undefined -o $f.wasm $a
 
 wasm2wat $f.wasm > $f.wat

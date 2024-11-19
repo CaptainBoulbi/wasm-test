@@ -57,7 +57,7 @@
                     <button id="play">Play</button>
                 </p>
                 <p>Players:</p>
-                <ul id="players"></ul>
+                <ul id="players">Not connected</ul>
                 <h3>Choose your penger:</h3>
             </div>
         </div>
