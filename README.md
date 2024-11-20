@@ -12,7 +12,13 @@ npm i
 # Play
 
 ```console
-npm start
+npm run start
+```
+
+or
+
+```console
+node server.js
 ```
 
 or
