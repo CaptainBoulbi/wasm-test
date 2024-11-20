@@ -27,6 +27,9 @@ window.onload = () => {
             is_connected = false;
             wasm_set_variable('nb_players', 0);
             document.getElementById('players').innerHTML = "Not connected";
+            document.getElementById('map-name').innerText = "Default Map";
+            document.getElementById('map-time').innerText = "-1";
+            wasm_function("set_default_map")();
         }
         connection.send('{"name": "pseudo", "value": "'+pseudo+'"}');
     };
@@ -72,6 +75,20 @@ connection.onmessage = (e) => {
             var player = players[i];
             if (player.rid == my_rid) continue;
             wasm_function('draw_player')(player.rid, player.id, player.x, player.y, player.dir);
+        }
+    }
+    else if (req.name == "map") {
+        var map = req.value;
+        document.getElementById("map-name").innerText = map.name;
+        console.log(Date.now(), " -> ", map.next_at);
+        wasm_function('reset_collisions')();
+        for (var i = 0; i < map.collisions.length; i++) {
+            wasm_function('add_collisions')(
+                map.collisions[i].x,
+                map.collisions[i].y,
+                map.collisions[i].width,
+                map.collisions[i].height
+            );
         }
     }
     else if (req.name == "disconnect") {

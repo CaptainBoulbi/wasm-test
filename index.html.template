@@ -58,6 +58,8 @@
                 </p>
                 <p>Players:</p>
                 <ul id="players">Not connected</ul>
+                <p>Playing map : <span id="map-name">Default Map</span></p>
+                <p>Next map in : <span id="map-time">-1</span></p>
                 <h3>Choose your penger:</h3>
             </div>
         </div>

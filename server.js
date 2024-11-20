@@ -34,6 +34,25 @@ function update_player_pos()
 }
 setTimeout(update_player_pos, update_time_ms);
 
+var current_map = 0;
+// var map_every_ms = 60 * 1000;
+var map_every_ms = 4 * 1000;
+function send_new_map()
+{
+    var map = maps[Math.floor(Math.random() * maps.length)];
+    map.next_at = Date.now() + map_every_ms;
+    sockets.forEach((s) => {
+        if (s.game.pseudo == undefined || s.game.pseudo == "") return;
+        s.send('{"name": "map", "value": '+JSON.stringify(map)+'}');
+    });
+    setTimeout(send_new_map, map_every_ms);
+}
+setTimeout(send_new_map, map_every_ms);
+function send_map(socket)
+{
+    socket.send('{"name": "map", "value": '+JSON.stringify(maps[current_map])+'}'); 
+}
+
 const requestListener = function (req, res) {
     var url = req.url;
 
@@ -75,6 +94,8 @@ http_server.listen(HTTP_PORT, () => {
     console.log(`Server is running on port ${HTTP_PORT}`);
 });
 
+var maps = JSON.parse(fs.readFileSync("maps.json"));
+
 const ws_server = new ws.Server({ port: WS_PORT });
 
 var global_id = 0;
@@ -83,7 +104,9 @@ var sockets = [];
 ws_server.on('connection', (socket) => {
     socket.game = {};
     socket.game.rid = global_id++;
+
     socket.send('{"name": "rid", "value": '+socket.game.rid+'}');
+
     sockets.push(socket);
     console.log("connect: ", sockets.length);
 
@@ -91,6 +114,7 @@ ws_server.on('connection', (socket) => {
         var msg_str = Buffer.from(msg).toString('latin1');
         var req = JSON.parse(msg_str);
         if (req.name == "pseudo") {
+            if (socket.game.pseudo == undefined || socket.game.pseudo == "" && req.value != "") send_map(socket);
             socket.game.pseudo = req.value;
             if (req.value == "") sockets.forEach((s) => { s.send('{"name": "disconnect", "value": '+socket.game.rid+'}') });
             update_player_list();

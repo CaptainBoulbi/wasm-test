@@ -5,7 +5,7 @@ if [[ "$1" == "clear" ]]; then
     exit
 fi;
 
-export_sym="init draw key_pressed key_released set_velocity set_mouse get_pos_x get_pos_y draw_player deco_player reset_collisions add_collisions BUFFER width height id nb_players dir"
+export_sym="init draw key_pressed key_released set_velocity set_mouse get_pos_x get_pos_y draw_player deco_player reset_collisions add_collisions set_default_map BUFFER width height id nb_players dir"
 export_cmd=""
 for e in $export_sym; do
     export_cmd="$export_cmd -Wl,--export=$e";

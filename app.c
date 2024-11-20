@@ -248,9 +248,9 @@ int collision(v2 point, int x, int y, int w, int h)
             point.y >= y && point.y < y + h);
 }
 
-void init()
+void set_default_map()
 {
-    pengers_init();
+    nb_collisions = 0;
     collisions[nb_collisions++] = (Collision) {
         .x = 100,
         .y = 400,
@@ -281,6 +281,12 @@ void init()
         .width = 75,
         .height = 75,
     };
+}
+
+void init()
+{
+    pengers_init();
+    set_default_map();
 }
 
 void draw(float dt)
