@@ -18,7 +18,7 @@ function update_player_list()
     });
 }
 
-var update_time_ms = 100;
+var update_time_ms = 16;
 function update_player_pos()
 {
     var list = [];

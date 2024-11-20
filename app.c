@@ -43,7 +43,7 @@ typedef struct Player {
     int rid, id, x, y, dir;
 } Player;
 
-#define MAX_PLAYERS 20
+#define MAX_PLAYERS 50
 Player players[MAX_PLAYERS] = {0};
 int nb_players = 0;
 

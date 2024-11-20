@@ -85,7 +85,7 @@ connection.onclose = (e) => {
     document.getElementById('players').innerHTML = "Not connected";
 };
 
-var update_time_ms = 100;
+var update_time_ms = 16;
 function send_pos()
 {
     if (is_connected) {
