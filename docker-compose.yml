@@ -1,8 +1,8 @@
 version: "3"
 
 services:
-  web:
-    container_name: "web"
+  penger-party:
+    container_name: "penger-party"
     image: "node"
     ports:
       - "6969:6969"

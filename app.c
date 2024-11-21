@@ -1,5 +1,6 @@
 #include "pengers.h"
 #include "hand.c"
+#include "coin.c"
 
 #define GREEN 0xff00ff00
 #define RED 0xff0000ff
@@ -20,6 +21,7 @@ int dir = 0;
 int get_scale(void);
 float random(void); // flemme de coder un algo random, je recup celui de js (Math.random)
 float sqrtf(float val); // pareil
+void coin_point(void);
 
 typedef struct v2 {
     float x, y;
@@ -283,6 +285,25 @@ void set_default_map()
     };
 }
 
+#define MAX_COIN 20
+v2 coins[MAX_COIN] = {0};
+int coin_collected[MAX_COIN] = {0};
+int nb_coins = 0;
+
+void reset_coins()
+{
+    for (int i = 0; i < nb_coins; i++) coin_collected[i] = 0;
+    nb_coins = 0;
+}
+void add_coin(int x, int y)
+{
+    if (nb_coins >= MAX_COIN) return;
+    coins[nb_coins++] = (v2) {
+        .x = x,
+        .y = y,
+    };
+}
+
 void init()
 {
     pengers_init();
@@ -365,6 +386,26 @@ void draw(float dt)
         Collision col = collision_rec(collisions[i], i, scale);
         x_collide = x_collide || (col.height > 1);
     }
+    for (int i = 0; i < nb_coins; i++) {
+        if (coin_collected[i]) continue;
+        Collision coin = {
+            .x = coins[i].x,
+            .y = coins[i].y,
+            .width = coin_width,
+            .height = coin_height
+        };
+        Collision peng = {
+            .x = penger_pos.x - pengers_width[id]*scale/2,
+            .y = penger_pos.y - pengers_height[id]*scale/2,
+            .width = pengers_width[id]*scale,
+            .height = pengers_height[id]*scale,
+        };
+        Collision col = collision_union(coin, peng);
+        if (col.width > 0 || col.height > 0) {
+            coin_collected[i] = 1;
+            coin_point();
+        }
+    }
 
     // dessine le penger des autres joueur
     for (int p = 0; p < nb_players; p ++) {
@@ -419,6 +460,23 @@ void draw(float dt)
                         continue;
                     BUFFER[idx_y*width + idx_x] = pengers_img[id][y*pengers_width[id] + i_for_reverse_pixel_rendering_it_s_craazy];
                 }
+            }
+        }
+    }
+
+    // dessine les coins
+    for (int c = 0; c < nb_coins; c++) {
+        if (coin_collected[c]) continue;
+        int scale = 2;
+        for (int y = 0; y < coin_height; y++) {
+            for (int i = 0; i < coin_width; i++) {
+                if (coin_img[y][i] <= 0x00FFFFFF) // pixel transparant
+                    continue;
+                int idx_x = coins[c].x + i;
+                int idx_y = coins[c].y + y;
+                if (idx_x < 0 || idx_x >= width || idx_y < 0 || idx_y >= height)
+                    continue;
+                BUFFER[idx_y*width + idx_x] = coin_img[y][i];
             }
         }
     }

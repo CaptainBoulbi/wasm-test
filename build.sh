@@ -5,7 +5,7 @@ if [[ "$1" == "clear" ]]; then
     exit
 fi;
 
-export_sym="init draw key_pressed key_released set_velocity set_mouse get_pos_x get_pos_y draw_player deco_player reset_collisions add_collisions set_default_map BUFFER width height id nb_players dir"
+export_sym="init draw key_pressed key_released set_velocity set_mouse get_pos_x get_pos_y draw_player deco_player reset_collisions add_collisions reset_coins add_coin set_default_map BUFFER width height id nb_players dir"
 export_cmd=""
 for e in $export_sym; do
     export_cmd="$export_cmd -Wl,--export=$e";
@@ -52,6 +52,7 @@ sed -e '/Choose your penger:/rpengers_image.html.temp' index.html.template > ind
 rm pengers_image.html.temp
 
 ./png2c "hand.png" > hand.c
+./png2c "coin.png" > coin.c
 
 clang -O3 --target=wasm32 -fno-builtin -nostdlib --no-standard-libraries -Wl,--no-entry $export_cmd -Wl,--allow-undefined -o $f.wasm $a
 

@@ -35,8 +35,7 @@ function update_player_pos()
 setTimeout(update_player_pos, update_time_ms);
 
 var current_map = 0;
-// var map_every_ms = 60 * 1000;
-var map_every_ms = 4 * 1000;
+var map_every_ms = 30 * 1000;
 function send_new_map()
 {
     var map = maps[Math.floor(Math.random() * maps.length)];
@@ -103,12 +102,13 @@ var global_id = 0;
 var sockets = [];
 ws_server.on('connection', (socket) => {
     socket.game = {};
+    socket.game.coin = 0;
     socket.game.rid = global_id++;
 
     socket.send('{"name": "rid", "value": '+socket.game.rid+'}');
 
     sockets.push(socket);
-    console.log("connect: ", sockets.length);
+    console.log("[", sockets.length, "] connect");
 
     socket.on('message', (msg) => {
         var msg_str = Buffer.from(msg).toString('latin1');
@@ -128,12 +128,15 @@ ws_server.on('connection', (socket) => {
             socket.game.y = req.y;
             socket.game.dir = req.dir;
         }
+        else if (req.name == "coin") {
+            socket.game.coin++;
+        }
     });
 
     socket.on('close', () => {
         sockets.forEach((s) => { s.send('{"name": "disconnect", "value": '+socket.game.rid+'}') });
         sockets = sockets.filter(s => s !== socket);
-        console.log("close: ", sockets.length);
+        console.log("[", sockets.length, "] close");
         update_player_list();
     });
 });

@@ -30,6 +30,7 @@ window.onload = () => {
             document.getElementById('map-name').innerText = "Default Map";
             document.getElementById('map-time').innerText = "-1";
             wasm_function("set_default_map")();
+            wasm_function('reset_coins')();
         }
         connection.send('{"name": "pseudo", "value": "'+pseudo+'"}');
     };
@@ -67,6 +68,7 @@ connection.onmessage = (e) => {
         }
     }
     else if (req.name == "rid") {
+        console.log(req);
         my_rid = req.value;
     }
     else if (req.name == "pos") {
@@ -80,7 +82,7 @@ connection.onmessage = (e) => {
     else if (req.name == "map") {
         var map = req.value;
         document.getElementById("map-name").innerText = map.name;
-        console.log(Date.now(), " -> ", map.next_at);
+        map_next_at = map.next_at != undefined ? map.next_at : (Date.now()+30*1000);
         wasm_function('reset_collisions')();
         for (var i = 0; i < map.collisions.length; i++) {
             wasm_function('add_collisions')(
@@ -88,6 +90,13 @@ connection.onmessage = (e) => {
                 map.collisions[i].y,
                 map.collisions[i].width,
                 map.collisions[i].height
+            );
+        }
+        wasm_function('reset_coins')();
+        for (var i = 0; i < map.coins.length; i++) {
+            wasm_function('add_coin')(
+                map.coins[i].x,
+                map.coins[i].y
             );
         }
     }
@@ -117,6 +126,19 @@ function send_pos()
 }
 setTimeout(send_pos, update_time_ms);
 
+var map_next_at = Date.now();
+function update_map_time() {
+    var t = -1;
+    if (is_connected) {
+        t = (map_next_at - Date.now()) / 1000;
+        t = t.toString();
+        t = t.substring(0, t.indexOf(".")+2);
+    }
+    document.getElementById('map-time').innerText = t;
+    setTimeout(update_map_time, 10);
+};
+setTimeout(update_map_time, 10);
+
 (async() => {
 
 // jsp, je l'ai pris de la: https://github.com/tsoding/olive.c
@@ -139,6 +161,10 @@ const { instance } = await WebAssembly.instantiateStreaming(fetch("./app.wasm"),
         'random': Math.random,
         'sqrtf': Math.sqrt,
         'get_scale': () => {return scale},
+        'coin_point': () => {
+            document.getElementById('nb-coin').innerText++;
+            connection.send('{"name": "coin"}');
+        },
     })
 });
 

@@ -52,7 +52,7 @@
             <div id="right">
                 <h3>Multiplayer:</h3>
                 <p>
-                    play with the pseudo name:
+                    Play online with the pseudo name:
                     <input id="pseudo" placeholder="Penger Lover" />
                     <button id="play">Play</button>
                 </p>
@@ -60,6 +60,7 @@
                 <ul id="players">Not connected</ul>
                 <p>Playing map : <span id="map-name">Default Map</span></p>
                 <p>Next map in : <span id="map-time">-1</span></p>
+                <p>Coin collected : <span id="nb-coin">0</span></p>
                 <h3>Choose your penger:</h3>
             </div>
         </div>
