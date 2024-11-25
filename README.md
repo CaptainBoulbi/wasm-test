@@ -9,6 +9,8 @@ npm i
 ./build.sh
 ```
 
+Run `node reset-leaderboard.js` for reset the today section of the leaderboard, add this command to your cron tab to reset daily (optional).
+
 # Play
 
 ```console
