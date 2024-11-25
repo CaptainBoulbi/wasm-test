@@ -49,7 +49,14 @@ function wasm_function(name)
     return global_instance.exports[name];
 }
 
-const connection = new WebSocket(document.URL.replace("http", "ws").replace(/(:6969|\/$)/, ":4242") /* get ws url to localhost or server */);
+var WS_URL = "";
+if (document.URL.includes("localhost") ) {
+    WS_URL = document.URL.replace("http", "ws").replace("6969", "4242")
+} else {
+    WS_URL = "wss://ws.penger.party/";
+}
+
+const connection = new WebSocket(WS_URL);
 // const connection = new WebSocket(document.URL.replace("http", "ws"));
 connection.onopen = (e) => { console.log("connection to server opened"); };
 connection.onmessage = (e) => {
