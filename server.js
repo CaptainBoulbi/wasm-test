@@ -82,6 +82,12 @@ const requestListener = function (req, res) {
         res.end(fs.readFileSync("." + url));
         return;
     }
+    if (url == "/create-map") {
+        res.setHeader("Content-Type", "text/html");
+        res.writeHead(200);
+        res.end(fs.readFileSync("./map-creator.html"));
+        return;
+    }
 
     res.setHeader("Content-Type", "text/html");
     res.writeHead(404);

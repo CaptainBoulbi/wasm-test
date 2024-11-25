@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Map creator for Penger Party</title>
+        <style>
+#canva {
+    width: 800px;
+    height: 600px;
+}
+@media screen and (min-width: calc(800px + calc(64px * 4))) {
+    #css-bullshit {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    #left {
+        float: left;
+        width: 50%;
+    }
+    #right {
+        float: right;
+        width: calc(100% - 800px - 25px);
+        position: absolute;
+        right: 0px;
+    }
+}
+        </style>
+    </head>
+    <body id="css-bullshit">
+        <h1>Map creator for Penger Party</h1>
+        <div id="left">
+            <canvas id="canva"></canvas>
+        </div>
+        <div id="right">
+            <textarea id="import-json" placeholder="map.json"></textarea>
+            <button id="import-butt">Import</button>
+            <form>
+                <input type="radio" name="type" id="is_coll" checked><label for="is_coll">collisions</label></input>
+                <input type="radio" name="type" id="is_coin"><label for="is_coin">coin</label></input>
+            </form>
+            name: <input id="map-name"></input>
+            <p>copie paste to maps.json:</p>
+            <pre id="mapjson"></pre>
+            <p>mouse = <span id="mousepos"></span></p>
+            <h3>Delete collisions:</h3>
+            <ul id="delete-coll"></ul>
+            <h3>Delete coins:</h3>
+            <ul id="delete-coin"></ul>
+        </div>
+    <script>
+        var WIDTH = 800;
+        var HEIGHT = 600;
+        var canva = document.getElementById("canva");
+        var mapjson = document.getElementById("mapjson");
+        var mapname = document.getElementById("map-name");
+        var mousepos = document.getElementById("mousepos");
+        var ctx = canva.getContext("2d");
+        ctx.canvas.width = WIDTH;
+        ctx.canvas.height = HEIGHT;
+        ctx.fillStyle = "blue";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        var map = {}
+        map.name = "test";
+        map.collisions = [];
+        map.coins = [];
+        mapname.onchange = (e) => {
+            map.name = mapname.value
+            mapjson.innerText = JSON.stringify(map);
+        };
+        var importbutt = document.getElementById("import-butt");
+        importbutt.onclick = () => {
+            var importjson = document.getElementById("import-json");
+            map = JSON.parse(importjson.value);
+        }
+        var clickidiclick = false;
+        document.addEventListener("mousemove", (e) => {
+            var rect = canva.getBoundingClientRect();
+            var x = Math.floor(e.clientX - rect.left);
+            var y = Math.floor(e.clientY - rect.top);
+            if (x < 0 || x >= WIDTH || y >= HEIGHT || y < 0) return;
+            mousepos.innerText = "x: "+x+", y: "+y;
+            if (clickidiclick) {
+                map.collisions[map.collisions.length-1].width = x - map.collisions[map.collisions.length-1].x;
+                map.collisions[map.collisions.length-1].height = y - map.collisions[map.collisions.length-1].y;
+            }
+        });
+        document.addEventListener("click", (e) => {
+            var rect = canva.getBoundingClientRect();
+            var x = Math.floor(e.clientX - rect.left);
+            var y = Math.floor(e.clientY - rect.top);
+            if (x < 0 || x >= WIDTH || y >= HEIGHT || y < 0) return;
+            if (document.getElementById("is_coll").checked) {
+                if (!clickidiclick) {
+                    map.collisions[map.collisions.length] = {x: x, y: y};
+                    document.getElementById("delete-coll").innerHTML += "<li><button onclick='del_coll("+JSON.stringify(map.collisions[map.collisions.length-1])+", this)'>x: "+x+", y: "+y+"</button></li>";
+                } else {
+                    var coll = map.collisions[map.collisions.length-1];
+                    if (coll.width < 0) {
+                        coll.x = coll.x + coll.width;
+                        coll.width = -coll.width;
+                    }
+                    if (coll.height < 0) {
+                        coll.y = coll.y + coll.height;
+                        coll.height = -coll.height;
+                    }
+                }
+                clickidiclick = !clickidiclick;
+            }
+            else if (document.getElementById("is_coin").checked) {
+                map.coins[map.coins.length] = {x: x-60/2, y: y-60/2};
+                document.getElementById("delete-coin").innerHTML += "<li><button onclick='del_coin("+JSON.stringify(map.coins[map.coins.length-1])+", this)'>x: "+x+", y: "+y+"</button></li>";
+                clickidiclick = false;
+            }
+            mapjson.innerText = JSON.stringify(map);
+        });
+        function del_coll(val, butt) {
+            var i = 0;
+            for (i = 0; i < map.collisions.length; i++) {
+                if (map.collisions[i].x == val.x && map.collisions[i].y == val.y) break;
+            }
+            map.collisions.splice(i, 1);
+            mapjson.innerText = JSON.stringify(map);
+            butt.parentElement.remove();
+        }
+        function del_coin(val, butt) {
+            var i = 0;
+            for (i = 0; i < map.coins.length; i++) {
+                if (map.coins[i].x == val.x && map.coins[i].y == val.y) break;
+            }
+            map.coins.splice(i, 1);
+            mapjson.innerText = JSON.stringify(map);
+            butt.parentElement.remove();
+        }
+        function draw() {
+            ctx.fillStyle = "green";
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+            for (var i = 0; i < map.collisions.length; i++) {
+                ctx.fillStyle = "red";
+                ctx.fillRect(
+                    map.collisions[i].x,
+                    map.collisions[i].y,
+                    map.collisions[i].width,
+                    map.collisions[i].height
+                );
+            }
+            for (var i = 0; i < map.coins.length; i++) {
+                ctx.beginPath();
+                ctx.arc(map.coins[i].x+60/2, map.coins[i].y+60/2, 60/2, 0, 2 * Math.PI);
+                ctx.fillStyle = "yellow";
+                ctx.fill();
+                ctx.stroke();
+            }
+            window.requestAnimationFrame(draw);
+        }
+        window.requestAnimationFrame(draw);
+    </script>
+    </body>
+</html>
