@@ -48,7 +48,7 @@ done
 echo "}" >> pengers.h
 
 echo -e "$pengers_html" > pengers_image.html.temp
-sed -e '/Choose your penger:/rpengers_image.html.temp' index.html.template > index.html
+sed -e '/<!-- penger images src -->/rpengers_image.html.temp' index.html.template > index.html
 rm pengers_image.html.temp
 
 ./png2c "hand.png" > hand.c

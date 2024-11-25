@@ -27,7 +27,7 @@ window.onload = () => {
             is_connected = false;
             wasm_set_variable('nb_players', 0);
             document.getElementById('players').innerHTML = "Not connected";
-            document.getElementById('map-name').innerText = "Default Map";
+            document.getElementById('map-name').innerText = "Offline Map";
             document.getElementById('map-time').innerText = "-1";
             wasm_function("set_default_map")();
             wasm_function('reset_coins')();
@@ -49,8 +49,8 @@ function wasm_function(name)
     return global_instance.exports[name];
 }
 
-const connection = new WebSocket(document.URL.replace('http', 'ws').replace('6969', '4242'));
-// const connection = new WebSocket('ws://localhost:4242');
+const connection = new WebSocket(document.URL.replace("http", "ws").replace(/(:6969|\/$)/, ":4242") /* get ws url to localhost or server */);
+// const connection = new WebSocket(document.URL.replace("http", "ws"));
 connection.onopen = (e) => { console.log("connection to server opened"); };
 connection.onmessage = (e) => {
     var req = JSON.parse(e.data);
@@ -68,7 +68,6 @@ connection.onmessage = (e) => {
         }
     }
     else if (req.name == "rid") {
-        console.log(req);
         my_rid = req.value;
     }
     else if (req.name == "pos") {
@@ -98,6 +97,20 @@ connection.onmessage = (e) => {
                 map.coins[i].x,
                 map.coins[i].y
             );
+        }
+    }
+    else if (req.name == "leaderboard") {
+        var tod = req.value.today;
+        var tot = req.value.total;
+        var el_tod = document.getElementById("leader-today");
+        var el_tot = document.getElementById("leader-total");
+        el_tod.innerHTML = "";
+        el_tot.innerHTML = "";
+        for (var i = 0; i < tod.length; i++) {
+            el_tod.innerHTML += "<li>"+tod[i].name+": "+tod[i].value+" coins </li>";
+        }
+        for (var i = 0; i < tot.length; i++) {
+            el_tot.innerHTML += "<li>"+tot[i].name+": "+tot[i].value+" coins </li>";
         }
     }
     else if (req.name == "disconnect") {

@@ -3,6 +3,7 @@ version: "3"
 services:
   penger-party:
     container_name: "penger-party"
+    restart: always
     image: "node"
     ports:
       - "6912:6969"

@@ -19,6 +19,20 @@
                 font-size: 1.5em;
                 margin: 0px;
             }
+            h3 {
+                margin-top: 7px;
+            }
+            .info {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+            .info > * {
+                margin-right: 1rem;
+            }
+            #chat {
+                width: 69%;
+            }
             @media screen and (min-width: calc(800px + calc(64px * 4))) {
                 #css-bullshit {
                     content: "";
@@ -44,24 +58,42 @@
             <div id="left">
                 <canvas id="demo-canvas"></canvas>
                 <h3>Instructions:</h3>
-                <p>Press q, d or arrow key to move</p>
-                <p>Press shift key to slow down</p>
-                <p>Press space key to jump</p>
-                <p>Penger is afraid of your stinky hand</p>
+                <ul>
+                    <li>Press q, d or arrow key to move</li>
+                    <li>Press shift key to slow down</li>
+                    <li>Press space key to jump</li>
+                    <li>Penger is afraid of your stinky fingers</li>
+                    <li>Choose your username to play online</li>
+                </ul>
             </div>
             <div id="right">
                 <h3>Multiplayer:</h3>
-                <p>
-                    Play online with the pseudo name:
-                    <input id="pseudo" placeholder="Penger Lover" />
-                    <button id="play">Play</button>
-                </p>
-                <p>Players:</p>
-                <ul id="players">Not connected</ul>
-                <p>Playing map : <span id="map-name">Default Map</span></p>
-                <p>Next map in : <span id="map-time">-1</span></p>
-                <p>Coin collected : <span id="nb-coin">0</span></p>
+                <div class="info">
+                    <p>
+                        Play online with the pseudo name :
+                        <input id="pseudo" placeholder="Penger Lover" />
+                        <button id="play">Play</button>
+                    </p>
+                    <p>Playing map : <span id="map-name">Offline Map</span></p>
+                    <p>Next map in : <span id="map-time">-1</span></p>
+                    <p>Coin collected : <span id="nb-coin">0</span></p>
+                </div>
+                <div class="info">
+                    <div>
+                        <h3>Players:</h3>
+                        <ul id="players">Not connected</ul>
+                    </div>
+                    <div>
+                        <h3>Today leaderboard:</h3>
+                        <ul id="leader-today"></ul>
+                    </div>
+                    <div>
+                        <h3>Total leaderboard:</h3>
+                        <ul id="leader-total"></ul>
+                    </div>
+                </div>
                 <h3>Choose your penger:</h3>
+                <!-- penger images src -->
             </div>
         </div>
         <h3>Made by a Penger Entousiast</h3>

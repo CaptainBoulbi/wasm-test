@@ -10,7 +10,7 @@ function update_player_list()
     var list = "";
     sockets.forEach((s) => {
         if (s.game.pseudo == undefined || s.game.pseudo == "") return;
-        list += "<li><img class='players-img' penger-id='"+s.game.id+"' src='museum/Penger.png'>" + s.game.pseudo + "</li>";
+        list += "<li><img class='players-img' penger-id='"+s.game.id+"' src='museum/Penger.png'>" + s.game.pseudo + ": " + s.game.coin + " coins</li>";
     });
     sockets.forEach((s) => {
         if (s.game.pseudo == undefined || s.game.pseudo == "") return;
@@ -94,6 +94,7 @@ http_server.listen(HTTP_PORT, () => {
 });
 
 var maps = JSON.parse(fs.readFileSync("maps.json"));
+var leaderboard = JSON.parse(fs.readFileSync("leaderboard.json"));
 
 const ws_server = new ws.Server({ port: WS_PORT });
 
@@ -106,6 +107,7 @@ ws_server.on('connection', (socket) => {
     socket.game.rid = global_id++;
 
     socket.send('{"name": "rid", "value": '+socket.game.rid+'}');
+    socket.send('{"name": "leaderboard", "value": '+JSON.stringify(leaderboard)+'}');
 
     sockets.push(socket);
     console.log("[", sockets.length, "] connect");
@@ -130,6 +132,38 @@ ws_server.on('connection', (socket) => {
         }
         else if (req.name == "coin") {
             socket.game.coin++;
+            update_player_list();
+            var update_leaderboard = false;
+            if (leaderboard.today[leaderboard.today.length-1].value < socket.game.coin) {
+                update_leaderboard = true;
+                var already_exist = leaderboard.today.find((e) => {return e.name == socket.game.pseudo});
+                if (already_exist != undefined) {
+                    already_exist.value++;
+                    leaderboard.today.sort((a, b) => {return a.value <= b.value ? 1 : -1;});
+                } else {
+                    leaderboard.today[leaderboard.today.length] = {name: socket.game.pseudo, value: socket.game.coin};
+                    leaderboard.today.sort((a, b) => {return a.value <= b.value ? 1 : -1;});
+                    leaderboard.today.pop();
+                }
+            }
+            if (leaderboard.total[leaderboard.total.length-1].value < socket.game.coin) {
+                update_leaderboard = true;
+                var already_exist = leaderboard.total.find((e) => {return e.name == socket.game.pseudo});
+                if (already_exist != undefined) {
+                    already_exist.value++;
+                    leaderboard.total.sort((a, b) => {return a.value <= b.value ? 1 : -1;});
+                } else {
+                    leaderboard.total[leaderboard.total.length] = {name: socket.game.pseudo, value: socket.game.coin};
+                    leaderboard.total.sort((a, b) => {return a.value <= b.value ? 1 : -1;});
+                    leaderboard.total.pop();
+                }
+            }
+            if (update_leaderboard) {
+                fs.writeFile('leaderboard.json', JSON.stringify(leaderboard), ()=>{});
+                sockets.forEach((s) => {
+                    s.send('{"name": "leaderboard", "value": '+JSON.stringify(leaderboard)+'}');
+                });
+            }
         }
     });
 
