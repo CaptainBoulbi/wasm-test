@@ -15,6 +15,8 @@ Run `node reset-leaderboard.js` for reset the today section of the leaderboard, 
 
 # Play
 
+Play at [penger.party](https://penger.party) or localy :
+
 ```console
 npm run start
 ```
