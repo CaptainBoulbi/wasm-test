@@ -138,7 +138,7 @@ typedef struct Collision {
     int x, y, width, height;
 } Collision;
 
-#define NB_COLLISIONS 10
+#define NB_COLLISIONS 64
 Collision collisions[NB_COLLISIONS] = {};
 int nb_collisions = 0;
 
