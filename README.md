@@ -2,6 +2,8 @@
 
 Let's penger together
 
+![game screenshot](game-screenshot.png)
+
 # Build
 
 ```console
