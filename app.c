@@ -1,6 +1,6 @@
-#include "pengers.h"
-#include "hand.c"
-#include "coin.c"
+#include "out/pengers.h"
+#include "out/hand.c"
+#include "out/coin.c"
 
 #define GREEN 0xff00ff00
 #define RED 0xff0000ff

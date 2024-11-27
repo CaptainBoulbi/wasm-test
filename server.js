@@ -46,6 +46,7 @@ function send_new_map()
     });
     setTimeout(send_new_map, map_every_ms);
 }
+
 setTimeout(send_new_map, map_every_ms);
 function send_map(socket)
 {
@@ -55,14 +56,14 @@ function send_map(socket)
 const requestListener = function (req, res) {
     var url = req.url;
 
-    if (url == "/" || url == "/index.html") {
+    if (url == "/") {
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);
-        res.end(fs.readFileSync("./index.html"));
+        res.end(fs.readFileSync("./out/index.html"));
         return;
     }
 
-    if (url == "/app.wasm") {
+    if (url == "/out/app.wasm") {
         res.setHeader("Content-Type", "application/wasm");
         res.writeHead(200);
         res.end(fs.readFileSync("." + url));
@@ -76,12 +77,20 @@ const requestListener = function (req, res) {
         return;
     }
 
-    if (url.startsWith("/museum/")) {
+    if (url.startsWith("/static/museum/")) {
 	    res.setHeader("Content-Type", "image/png");
         res.writeHead(200);
         res.end(fs.readFileSync("." + url));
         return;
     }
+
+    if (url.startsWith("/static/css/")) {
+	    res.setHeader("Content-Type", "text/css");
+        res.writeHead(200);
+        res.end(fs.readFileSync("." + url));
+        return;
+    }
+
     if (url == "/create-map") {
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);

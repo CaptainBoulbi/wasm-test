@@ -175,7 +175,7 @@ function make_environment(...envs) {
     });
 }
 
-const { instance } = await WebAssembly.instantiateStreaming(fetch("./app.wasm"), {
+const { instance } = await WebAssembly.instantiateStreaming(fetch("./out/app.wasm"), {
     "env": make_environment({
         // importer les fonctions dans le wasm
         'random': Math.random,

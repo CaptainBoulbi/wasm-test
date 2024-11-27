@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   penger-party:
     container_name: "penger-party"
