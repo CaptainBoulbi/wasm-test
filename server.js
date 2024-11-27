@@ -109,7 +109,7 @@ http_server.listen(HTTP_PORT, () => {
 });
 
 var maps = JSON.parse(fs.readFileSync("maps.json"));
-var leaderboard = JSON.parse(fs.readFileSync("out/leaderboard.json"));
+var leaderboard = JSON.parse(fs.readFileSync("leaderboard.json"));
 
 const ws_server = new ws.Server({ port: WS_PORT });
 
@@ -173,7 +173,7 @@ ws_server.on('connection', (socket) => {
                 leaderboard.total.pop();
             }
             if (update_leaderboard) {
-                fs.writeFile('out/leaderboard.json', JSON.stringify(leaderboard), ()=>{});
+                fs.writeFile('leaderboard.json', JSON.stringify(leaderboard), ()=>{});
                 sockets.forEach((s) => {
                     s.send('{"name": "leaderboard", "value": '+JSON.stringify(leaderboard)+'}');
                 });

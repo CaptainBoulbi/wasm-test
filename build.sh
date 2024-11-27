@@ -58,5 +58,3 @@ rm pengers_image.html.temp
 clang -O3 --target=wasm32 -fno-builtin -nostdlib --no-standard-libraries -Wl,--no-entry $export_cmd -Wl,--allow-undefined -o out/$f.wasm $a
 
 wasm2wat out/$f.wasm > out/$f.wat
-
-cp templates/leaderboard.json.template out/leaderboard.json
