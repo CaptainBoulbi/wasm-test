@@ -1,10 +1,3 @@
-app.wasm
-app.wat
-png2c
-penger.c
-hand.c
-index.html
-museum.c
-pengers.h
 node_modules/
-coin.c
+out/*
+!out/.gitkeep
