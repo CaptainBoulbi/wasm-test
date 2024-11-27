@@ -20,11 +20,23 @@ int main(int argc, const char *argv[])
     }
 
     if (argc < 3) { // no id provided
-        int file_name_len = strlen(img_path) - strlen(".png");
+        char *last_slash = strrchr(img_path, '/');
+        char extracted[50];
 
-        printf("int %.*s_height = %d;\n", file_name_len, img_path, height);
-        printf("int %.*s_width = %d;\n", file_name_len, img_path, width);
-        printf("unsigned int %.*s_img[%d][%d] = {\n", file_name_len, img_path, height, width);
+        if (last_slash != NULL) {
+            // Extract the part after the last '/'
+            strcpy(extracted, last_slash + 1);
+            
+            // Remove the '.png' extension
+            char *dot = strrchr(extracted, '.');
+            if (dot != NULL) {
+                *dot = '\0'; // Null-terminate the string at the '.'
+            }
+        }
+
+        printf("int %s_height = %d;\n", extracted, height);
+        printf("int %s_width = %d;\n", extracted, width);
+        printf("unsigned int %s_img[%d][%d] = {\n", extracted, height, width);
 
         for (int y = 0; y < height; y++) {
             printf("    ");

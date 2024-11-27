@@ -51,8 +51,8 @@ echo -e "$pengers_html" > pengers_image.html.temp
 sed -e '/<!-- penger images src -->/rpengers_image.html.temp' index.html.template > index.html
 rm pengers_image.html.temp
 
-./png2c "hand.png" > hand.c
-./png2c "coin.png" > coin.c
+./out/png2c "static/assets/hand.png" > out/hand.c
+./out/png2c "static/assets/coin.png" > out/coin.c
 
 clang -O3 --target=wasm32 -fno-builtin -nostdlib --no-standard-libraries -Wl,--no-entry $export_cmd -Wl,--allow-undefined -o $f.wasm $a
 
