@@ -1,19 +1,10 @@
-body{
-    background-color: pink;
-}
-#demo-canvas {
-    border-radius: 30px;
-    filter: drop-shadow(0 0 0.75rem black);
-}
 #demo-canvas:hover {
     cursor: none
 }
 .penger-img {
     width: 64px;
-    image-rendering: pixelated;
-    border-radius: 5px;
-    border: solid 1px white;
     height: 64px;
+    image-rendering: pixelated;
     object-fit: contain;
     transition: transform 0.2s;
 }
