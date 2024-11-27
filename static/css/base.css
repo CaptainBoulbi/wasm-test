@@ -1,0 +1,64 @@
+body{
+    background-color: pink;
+}
+#demo-canvas {
+    border-radius: 30px;
+    filter: drop-shadow(0 0 0.75rem black);
+}
+#demo-canvas:hover {
+    cursor: none
+}
+.penger-img {
+    width: 64px;
+    image-rendering: pixelated;
+    border-radius: 5px;
+    border: solid 1px white;
+    height: 64px;
+    object-fit: contain;
+    transition: transform 0.2s;
+}
+.penger-img:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+.players-img {
+    margin-right: 10px;
+}
+h1 {
+    text-align: center;
+    font-size: 3.5em;
+    margin: 0px;
+    margin-bottom: 20px;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+h3 {
+    margin-top: 7px;
+}
+.info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.info > * {
+    margin-right: 1rem;
+}
+#chat {
+    width: 69%;
+}
+@media screen and (min-width: calc(800px + calc(64px * 4))) {
+    #css-bullshit {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    #left {
+        float: left;
+        width: 50%;
+    }
+    #right {
+        float: right;
+        width: calc(100% - 800px - 25px);
+        position: absolute;
+        right: 0px;
+    }
+}

@@ -28,10 +28,10 @@ rm -f museum.c/*
 pengers_html=$'\n'
 pengers_include=$'\n'
 id=0
-for p in $(ls museum); do
+for p in $(ls static/museum/); do
     file=$(echo $p | sed "s/\.png$//g")
-    ./png2c "museum/"$p $id > museum.c/$file.c
-    pengers_html+=$'                <img src="museum/'$p'" class="penger-img" penger-id="'$id'"></img>\n'
+    ./png2c "static/museum/"$p $id > museum.c/$file.c
+    pengers_html+=$'                <img src="static/museum/'$p'" class="penger-img" penger-id="'$id'"></img>\n'
     pengers_include+='#include "museum.c/'$file$'.c"\n'
     ((id=id+1))
 done

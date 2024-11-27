@@ -76,12 +76,20 @@ const requestListener = function (req, res) {
         return;
     }
 
-    if (url.startsWith("/museum/")) {
+    if (url.startsWith("/static/museum/")) {
 	    res.setHeader("Content-Type", "image/png");
         res.writeHead(200);
         res.end(fs.readFileSync("." + url));
         return;
     }
+
+    if (url.startsWith("/static/css/")) {
+	    res.setHeader("Content-Type", "text/css");
+        res.writeHead(200);
+        res.end(fs.readFileSync("." + url));
+        return;
+    }
+
     if (url == "/create-map") {
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);

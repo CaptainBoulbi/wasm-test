@@ -3,57 +3,11 @@
     <head>
         <title>Penger Party</title>
         <script src="load.js"></script>
-        <style>
-            #demo-canvas:hover {
-                cursor: none
-            }
-            .penger-img {
-                width: 64px;
-                image-rendering: pixelated;
-            }
-            .players-img {
-                margin-right: 10px;
-            }
-            h1 {
-                text-align: center;
-                font-size: 1.5em;
-                margin: 0px;
-            }
-            h3 {
-                margin-top: 7px;
-            }
-            .info {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
-            }
-            .info > * {
-                margin-right: 1rem;
-            }
-            #chat {
-                width: 69%;
-            }
-            @media screen and (min-width: calc(800px + calc(64px * 4))) {
-                #css-bullshit {
-                    content: "";
-                    display: table;
-                    clear: both;
-                }
-                #left {
-                    float: left;
-                    width: 50%;
-                }
-                #right {
-                    float: right;
-                    width: calc(100% - 800px - 25px);
-                    position: absolute;
-                    right: 0px;
-                }
-            }
-        </style>
+        <link rel="stylesheet" href="/static/css/base.css">
+        <link rel="stylesheet" href="/static/css/rainbow.css">
     </head>
     <body>
-        <h1>Penger Party</h1>
+        <h1 class="rainbow">Penger Party</h1>
         <div id="css-bullshit">
             <div id="left">
                 <canvas id="demo-canvas"></canvas>
@@ -93,9 +47,11 @@
                     </div>
                 </div>
                 <h3>Choose your penger:</h3>
+                <div>
                 <!-- penger images src -->
+                </div>
             </div>
         </div>
-        <h3>Made by a Penger Entousiast</h3>
+        <h3><a target="_blank" href="https://n3m0.fr/">Made by </a><a target="_blank" href="https://fruitpassion.fr/">a</a><a target="_blank" href="https://n3m0.fr/"> Penger Entousiast</a></h3>
     </body>
 </html>
