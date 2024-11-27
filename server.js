@@ -46,6 +46,7 @@ function send_new_map()
     });
     setTimeout(send_new_map, map_every_ms);
 }
+
 setTimeout(send_new_map, map_every_ms);
 function send_map(socket)
 {
@@ -55,14 +56,14 @@ function send_map(socket)
 const requestListener = function (req, res) {
     var url = req.url;
 
-    if (url == "/" || url == "/index.html") {
+    if (url == "/") {
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);
-        res.end(fs.readFileSync("./index.html"));
+        res.end(fs.readFileSync("./out/index.html"));
         return;
     }
 
-    if (url == "/app.wasm") {
+    if (url == "/out/app.wasm") {
         res.setHeader("Content-Type", "application/wasm");
         res.writeHead(200);
         res.end(fs.readFileSync("." + url));
@@ -108,7 +109,7 @@ http_server.listen(HTTP_PORT, () => {
 });
 
 var maps = JSON.parse(fs.readFileSync("maps.json"));
-var leaderboard = JSON.parse(fs.readFileSync("leaderboard.json"));
+var leaderboard = JSON.parse(fs.readFileSync("out/leaderboard.json"));
 
 const ws_server = new ws.Server({ port: WS_PORT });
 
@@ -172,7 +173,7 @@ ws_server.on('connection', (socket) => {
                 leaderboard.total.pop();
             }
             if (update_leaderboard) {
-                fs.writeFile('leaderboard.json', JSON.stringify(leaderboard), ()=>{});
+                fs.writeFile('out/leaderboard.json', JSON.stringify(leaderboard), ()=>{});
                 sockets.forEach((s) => {
                     s.send('{"name": "leaderboard", "value": '+JSON.stringify(leaderboard)+'}');
                 });
