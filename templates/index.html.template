@@ -3,6 +3,7 @@
     <head>
         <title>Penger Party</title>
         <script src="load.js"></script>
+        <script defer data-domain="penger.party" src="https://plausible.boulbicorp.fr/js/script.js"></script>
         <link rel="stylesheet" href="/static/css/base.css">
         <link rel="stylesheet" href="/static/css/rainbow.css">
     </head>
