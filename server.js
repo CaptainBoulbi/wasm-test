@@ -91,6 +91,13 @@ const requestListener = function (req, res) {
         return;
     }
 
+    if (url == "/static/penger.txt" || url == "/penger.txt" ) {
+	    res.setHeader("Content-Type", "plain");
+        res.writeHead(200);
+        res.end(fs.readFileSync("static/penger.txt"));
+        return;
+    }
+
     if (url == "/create-map") {
         res.setHeader("Content-Type", "text/html");
         res.writeHead(200);
